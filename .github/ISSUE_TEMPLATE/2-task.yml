@@ -1,0 +1,14 @@
+name: Task
+description: Un trabajo específico que contribuye a la implemantación de una funcionalidad. Probablemente por un grupo de personas.
+title: "[Task]: "
+projects: Assesment_67 Project
+body:
+  - type: textarea
+    id: details
+    attributes:
+      label: Detalles
+      description: Los detalles de la tarea. Qué se necesita en términos de software.
+      placeholder: Nueva funcionalidad implementada que permite a los usuarios ver como se están utilizando los recursos de la plataforma. 
+        Se pueden ver como los criterios de aceptación de algo más grande.
+    validations:
+      required: true

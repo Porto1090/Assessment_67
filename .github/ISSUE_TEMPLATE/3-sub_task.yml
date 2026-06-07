@@ -1,0 +1,18 @@
+name: Sub-Task
+description: Un trabajo muy específico que se basa en una tarea y que requiere seguimiento, debate y trabajo independiente. Probablemente por una sola persona.
+title: "[Sub-Task]: "
+projects: Assesment_67 Project
+body:
+  - type: textarea
+    id: details
+    attributes:
+      label: Detalles
+      description: Los detalles para que varias subtareas se acumulen hasta la realización de una más grande.
+      placeholder: |
+        Una tabla con las columnas para organizar el trabajo:
+        - Entregable
+        - Dueño
+        - Fecha estimada
+        - Estado
+    validations:
+      required: true

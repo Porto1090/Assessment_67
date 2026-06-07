@@ -1,0 +1,53 @@
+name: User Story
+description: Historia de usuario específica para las solicitudes de funciones del cliente.
+title: "[US]: "
+projects: Assesment_67 Project
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Una buena Historia de Usuario sigue el patrón Rol-Función-Beneficio:
+        Como [ tipo de usuario ], quiero [ una acción ], para que [ alguna razón ].
+        
+        Los Criterios de Aceptación de la US se convierten en Tasks, que deben crearse como issues aparte.
+  - type: dropdown
+    id: role
+    attributes:
+      label: Como
+      description: Rol que se ve involucrado en la historia de usuario.
+      options:
+        - Usuario
+        - Doctor
+        - Enfermera
+        - Secretaria
+    validations:
+      required: true
+  - type: input
+    id: feature
+    attributes:
+      label: quiero
+      description: La función que el usuario desea que forme parte del software.
+      placeholder: ver un dashboard completo del contendido de la plataforma
+    validations:
+      required: true
+  - type: input
+    id: purpose
+    attributes:
+      label: para que
+      description: La razón por la que el usuario desea que la función forme parte del software.
+      placeholder: pueda ver el uso de la plataforma y los recursos que se están utilizando.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Criterios de Aceptación
+      description: Los criterios de aceptación son condiciones que deben cumplirse para que la historia de usuario se considere completa.
+      placeholder: |
+        - Los doctores pueden ver el dashboard completo del contenido de la plataforma.
+        - Los doctores pueden ver el uso de la plataforma y los recursos que se están utilizando.
+        - Los doctores administran más de un paciente.
+        ...
+    validations:
+      required: true
+    
