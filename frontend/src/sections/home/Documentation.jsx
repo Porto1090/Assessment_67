@@ -1,154 +1,71 @@
 import { useEffect, useState } from "react";
-
-const sections = [
-  {
-    title: "Documentation sections:",
-    items: [
-      {
-        name: "What's new in CipherVision?",
-        description: "Recent language changes and updates.",
-        content: `
-CipherVision introduces improvements for source code analysis, syntax validation, and compiler feedback.
-
-Key updates:
-• Better syntax error detection
-• Improved lexical analysis
-• Cleaner compiler output
-• More detailed terminal messages
-        `,
-      },
-      {
-        name: "Tutorial",
-        description: "Start here: a tour of Portronko's syntax and features.",
-        content: `
-Basic CipherVisionexample:
-
-int suma(int a, int b) {
-  int c;
-  c = a + b;
-  return c;
-}
-
-int main() {
-  int x;
-  int y;
-  int z;
-
-  x = 4;
-  y = 4;
-
-  z = suma(x, y);
-
-  return z;
-}
-
-Use the code editor to write your program and press Run Analysis to evaluate it.
-        `,
-      },
-    ],
-  },
-  {
-    title: "Indices, glossary, and search:",
-    items: [
-      {
-        name: "Global index",
-        description: "All functions, classes, and terms.",
-        content: `
-Global Index:
-
-• int
-• return
-• if
-• while
-• function declaration
-• variable declaration
-• arithmetic operators
-• comparison operators
-• lexical analysis
-• syntax analysis
-• AST generation
-        `,
-      },
-      {
-        name: "Glossary",
-        description: "Terms explained.",
-        content: `
-Glossary:
-
-Lexer:
-Reads the source code and converts it into tokens.
-
-Parser:
-Checks if the code follows the grammar rules.
-
-AST:
-Abstract Syntax Tree. It represents the structure of the program.
-
-Compiler:
-Transforms source code into an intermediate or executable representation.
-
-CNN:
-Machine learning model used for visual pattern detection.
-
-SVM:
-Machine learning model used for classification tasks.
-        `,
-      },
-    ],
-  },
-  {
-    title: "Project information:",
-    items: [
-      {
-        name: "Reporting issues",
-        description: "How to report issues and contribute to the project.",
-        content: `
-Reporting Issues:
-
-When reporting an issue, include:
-
-• What you were trying to analyze
-• The input image or source code
-• The error message
-• Steps to reproduce the issue
-• Expected result
-• Actual result
-
-This helps the team debug faster.
-        `,
-      },
-      {
-        name: "Project public repository",
-        description: "Access the project's public repository.",
-        content: `
-Repository Information:
-
-This project includes:
-
-• React frontend
-• Code editor interface
-• Documentation panel
-• Image analysis workflow
-• Source code analysis workflow
-• Backend compiler endpoint
-
-Use Git branches to work safely without affecting main or develop.
-        `,
-      },
-    ],
-  },
-];
-
-const docs = sections.reduce((acc, section) => {
-  section.items.forEach((item) => {
-    acc[item.name] = item;
-  });
-
-  return acc;
-}, {});
+import { useLanguage } from "@/translations/LanguageContext";
 
 export default function Documentation() {
+  const { t, language } = useLanguage();
   const [active, setActive] = useState("home");
+
+  const sections = [
+    {
+      title: t.documentationSections,
+      items: [
+        {
+          id: "whatsNew",
+          name: t.whatsNew,
+          description: t.whatsNewDescription,
+          content: t.whatsNewContent,
+        },
+        {
+          id: "tutorial",
+          name: t.tutorial,
+          description: t.tutorialDescription,
+          content: t.tutorialContent,
+        },
+      ],
+    },
+    {
+      title: t.referenceGuide,
+      items: [
+        {
+          id: "globalIndex",
+          name: t.globalIndex,
+          description: t.globalIndexDescription,
+          content: t.globalIndexContent,
+        },
+        {
+          id: "glossary",
+          name: t.glossary,
+          description: t.glossaryDescription,
+          content: t.glossaryContent,
+        },
+      ],
+    },
+    {
+      title: t.projectInformation,
+      items: [
+        {
+          id: "reportingIssues",
+          name: t.reportingIssues,
+          description: t.reportingIssuesDescription,
+          content: t.reportingIssuesContent,
+        },
+        {
+          id: "projectRepository",
+          name: t.projectRepository,
+          description: t.projectRepositoryDescription,
+          content: t.projectRepositoryContent,
+        },
+      ],
+    },
+  ];
+
+  const docs = sections.reduce((acc, section) => {
+    section.items.forEach((item) => {
+      acc[item.id] = item;
+    });
+
+    return acc;
+  }, {});
 
   const current = docs[active];
 
@@ -156,16 +73,19 @@ export default function Documentation() {
     console.log("Current documentation page:", active);
   }, [active]);
 
+  useEffect(() => {
+    setActive("home");
+  }, [language]);
+
   return (
     <div className="flex h-full w-full flex-col bg-white">
       <header className="mb-8">
         <h2 className="text-3xl font-bold text-slate-800">
-          Need Help?
+          {t.documentationTitle}
         </h2>
 
         <p className="mt-4 text-base leading-7 text-slate-500">
-          Welcome. This panel contains the official documentation reference and
-          learning resources.
+          {t.documentationSubtitle}
         </p>
       </header>
 
@@ -188,9 +108,9 @@ export default function Documentation() {
                 <div className="space-y-4">
                   {section.items.map((item) => (
                     <button
-                      key={item.name}
+                      key={item.id}
                       type="button"
-                      onClick={() => setActive(item.name)}
+                      onClick={() => setActive(item.id)}
                       className="block w-full rounded-xl px-4 py-4 text-left transition hover:bg-blue-50"
                     >
                       <div className="text-lg font-bold text-blue-600">
@@ -215,7 +135,7 @@ export default function Documentation() {
               onClick={() => setActive("home")}
               className="mb-6 text-sm font-medium text-slate-500 transition hover:text-blue-600"
             >
-              ← Back to documentation
+              {t.backToDocumentation}
             </button>
 
             <h3 className="text-2xl font-bold text-slate-800">
