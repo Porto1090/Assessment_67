@@ -290,7 +290,7 @@ ${result.explanation || "No hidden message detected."}`
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
               <h1 className="text-4xl lg:text-6xl font-bold text-slate-800 mb-6 leading-tight">
-                Recover Hidden Messages from Images
+                Recover Hidden Messages
               </h1>
 
               <p className="text-lg lg:text-xl text-slate-500 max-w-3xl mx-auto">
