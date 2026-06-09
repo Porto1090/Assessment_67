@@ -12,8 +12,10 @@ import {
 } from "lucide-react";
 import Button from "@/components/Button";
 import Documentation from "@/sections/home/Documentation.jsx";
+import { useLanguage } from "@/translations/LanguageContext";
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   const [mode, setMode] = useState("image");
   const [stage, setStage] = useState("idle");
   const [result, setResult] = useState(null);
@@ -21,8 +23,7 @@ export default function Dashboard() {
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState("Initializing analysis...");
 
-  const [code, setCode] = useState(`// Escribe tu código a compilar acá
-// Recuerda utilizar la documentación a tu derecha para guiarte en el proceso
+  const [code, setCode] = useState(`
 
 int suma(int a, int b) {
   int c;
@@ -290,12 +291,11 @@ ${result.explanation || "No hidden message detected."}`
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
               <h1 className="text-4xl lg:text-6xl font-bold text-slate-800 mb-6 leading-tight">
-                Recover Hidden Messages
+                {t.dashboardTitle}
               </h1>
 
               <p className="text-lg lg:text-xl text-slate-500 max-w-3xl mx-auto">
-                Upload an image or write code and allow our AI models to analyze
-                hidden encrypted information.
+                 {t.dashboardSubtitle}
               </p>
             </div>
 
@@ -311,7 +311,7 @@ ${result.explanation || "No hidden message detected."}`
                   }`}
                 >
                   <Upload className="w-5 h-5" />
-                  Upload Image
+                  {t.uploadImage}
                 </button>
 
                 <button
@@ -324,7 +324,7 @@ ${result.explanation || "No hidden message detected."}`
                   }`}
                 >
                   <Code2 className="w-5 h-5" />
-                  Write Code
+                  {t.writeCode}
                 </button>
               </div>
             </div>
@@ -360,7 +360,7 @@ ${result.explanation || "No hidden message detected."}`
                     fileInputRef.current?.click();
                   }}
                 >
-                  Select File
+                  {t.selectFile}
                 </Button>
 
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-8">
@@ -404,7 +404,7 @@ ${result.explanation || "No hidden message detected."}`
                     icon={<Play className="w-4 h-4" />}
                     onClick={runCodeAnalysis}
                   >
-                    Run Analysis
+                    {t.runAnalysis}
                   </Button>
                 </div>
 
