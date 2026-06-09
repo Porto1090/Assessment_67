@@ -1,26 +1,48 @@
 import { Routes, Route } from "react-router-dom";
 
+import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
-import Home from "@/pages/Home";
+import History from "@/pages/History";
+import Help from "@/pages/Help";
 import NotFound from "@/pages/NotFound";
 
-import ProtectedRoute from "@/routes/ProtectedRoute";
+import RootLayout from "@/pages/RootLayout";
 
 export default function AppRouter() {
   return (
     <Routes>
       {/* Públicas */}
-      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
 
-      {/* Protegidas */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
+      {/* Área principal de CipherVision */}
+      <Route element={<RootLayout />}>
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+        <Route
+          path="/history"
+          element={<History />}
+        />
+
+        <Route
+          path="/help"
+          element={<Help />}
+        />
       </Route>
 
       {/* 404 */}
-      <Route path="*" element={<NotFound />} />
+      <Route
+        path="*"
+        element={<NotFound />}
+      />
     </Routes>
   );
 }
