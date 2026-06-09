@@ -5,8 +5,58 @@ import {
   XCircle,
   Filter,
 } from "lucide-react";
+import { useLanguage } from "@/translations/LanguageContext";
 
 export default function History() {
+  const { language } = useLanguage();
+
+  const t = {
+    en: {
+      title: "Analysis History",
+      subtitle: "View all your previous image and code analysis results",
+      searchPlaceholder: "Search by file name...",
+      allStatus: "All Status",
+      detected: "Detected",
+      notDetected: "Not Detected",
+      allModels: "All Models",
+      noHistory: "No Analysis History",
+      noResults: "No Results Found",
+      emptyHistory: "Start analyzing images or code to see your history here",
+      emptyResults: "Try adjusting your filters or search query",
+      date: "DATE",
+      image: "IMAGE",
+      model: "MODEL",
+      status: "STATUS",
+      confidence: "CONFIDENCE",
+      showing: "Showing",
+      of: "of",
+      results: "results",
+    },
+
+    es: {
+      title: "Historial de Análisis",
+      subtitle: "Consulta todos tus análisis anteriores de imágenes y código",
+      searchPlaceholder: "Buscar por nombre de archivo...",
+      allStatus: "Todos los estados",
+      detected: "Detectado",
+      notDetected: "No Detectado",
+      allModels: "Todos los modelos",
+      noHistory: "No hay historial de análisis",
+      noResults: "No se encontraron resultados",
+      emptyHistory:
+        "Comienza analizando imágenes o código para ver tu historial aquí",
+      emptyResults: "Intenta ajustar tus filtros o búsqueda",
+      date: "FECHA",
+      image: "IMAGEN",
+      model: "MODELO",
+      status: "ESTADO",
+      confidence: "CONFIANZA",
+      showing: "Mostrando",
+      of: "de",
+      results: "resultados",
+    },
+  }[language];
+
   const [history, setHistory] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -34,17 +84,13 @@ export default function History() {
       filterModel === "all" ||
       item.model === filterModel;
 
-    return (
-      matchesSearch &&
-      matchesStatus &&
-      matchesModel
-    );
+    return matchesSearch && matchesStatus && matchesModel;
   });
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
 
-    return date.toLocaleString("en-US", {
+    return date.toLocaleString(language === "es" ? "es-MX" : "en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -59,8 +105,6 @@ export default function History() {
       style={{ backgroundColor: "#F8FAFC" }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Header */}
         <div className="mb-8">
           <h1
             className="mb-2"
@@ -70,7 +114,7 @@ export default function History() {
               color: "#1E293B",
             }}
           >
-            Analysis History
+            {t.title}
           </h1>
 
           <p
@@ -79,15 +123,12 @@ export default function History() {
               color: "#64748B",
             }}
           >
-            View all your previous image analysis results
+            {t.subtitle}
           </p>
         </div>
 
-        {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-            {/* Search */}
             <div className="md:col-span-2">
               <div className="relative">
                 <Search
@@ -98,10 +139,8 @@ export default function History() {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) =>
-                    setSearchQuery(e.target.value)
-                  }
-                  placeholder="Search by file name..."
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t.searchPlaceholder}
                   className="w-full pl-10 pr-4 py-3 rounded-lg border outline-none"
                   style={{
                     borderColor: "#E2E8F0",
@@ -111,43 +150,38 @@ export default function History() {
               </div>
             </div>
 
-            {/* Status */}
             <div>
               <select
                 value={filterStatus}
-                onChange={(e) =>
-                  setFilterStatus(e.target.value)
-                }
+                onChange={(e) => setFilterStatus(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border outline-none"
                 style={{
                   borderColor: "#E2E8F0",
                   backgroundColor: "#F8FAFC",
                 }}
               >
-                <option value="all">All Status</option>
-                <option value="detected">Detected</option>
+                <option value="all">{t.allStatus}</option>
+                <option value="detected">{t.detected}</option>
                 <option value="not-detected">
-                  Not Detected
+                  {t.notDetected}
                 </option>
               </select>
             </div>
 
-            {/* Model */}
             <div>
               <select
                 value={filterModel}
-                onChange={(e) =>
-                  setFilterModel(e.target.value)
-                }
+                onChange={(e) => setFilterModel(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border outline-none"
                 style={{
                   borderColor: "#E2E8F0",
                   backgroundColor: "#F8FAFC",
                 }}
               >
-                <option value="all">All Models</option>
+                <option value="all">{t.allModels}</option>
                 <option value="CNN">CNN</option>
                 <option value="SVM">SVM</option>
+                <option value="Code Analyzer">Code Analyzer</option>
               </select>
             </div>
           </div>
@@ -155,7 +189,6 @@ export default function History() {
 
         {filteredHistory.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-
             <div className="flex justify-center mb-4">
               <div
                 className="flex items-center justify-center w-16 h-16 rounded-full"
@@ -178,9 +211,7 @@ export default function History() {
                 color: "#1E293B",
               }}
             >
-              {history.length === 0
-                ? "No Analysis History"
-                : "No Results Found"}
+              {history.length === 0 ? t.noHistory : t.noResults}
             </h3>
 
             <p
@@ -189,14 +220,11 @@ export default function History() {
                 color: "#64748B",
               }}
             >
-              {history.length === 0
-                ? "Start analyzing images to see your history here"
-                : "Try adjusting your filters or search query"}
+              {history.length === 0 ? t.emptyHistory : t.emptyResults}
             </p>
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-
             <table className="w-full">
               <thead
                 style={{
@@ -205,29 +233,26 @@ export default function History() {
               >
                 <tr>
                   <th className="px-6 py-4 text-left">
-                    DATE
+                    {t.date}
                   </th>
                   <th className="px-6 py-4 text-left">
-                    IMAGE
+                    {t.image}
                   </th>
                   <th className="px-6 py-4 text-left">
-                    MODEL
+                    {t.model}
                   </th>
                   <th className="px-6 py-4 text-left">
-                    STATUS
+                    {t.status}
                   </th>
                   <th className="px-6 py-4 text-left">
-                    CONFIDENCE
+                    {t.confidence}
                   </th>
                 </tr>
               </thead>
 
               <tbody>
                 {filteredHistory.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="border-t"
-                  >
+                  <tr key={index} className="border-t">
                     <td className="px-6 py-4">
                       {formatDate(item.date)}
                     </td>
@@ -244,12 +269,12 @@ export default function History() {
                       {item.detected ? (
                         <div className="flex items-center gap-2 text-green-600">
                           <CheckCircle2 className="w-4 h-4" />
-                          Detected
+                          {t.detected}
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 text-red-600">
                           <XCircle className="w-4 h-4" />
-                          Not Detected
+                          {t.notDetected}
                         </div>
                       )}
                     </td>
@@ -272,8 +297,8 @@ export default function History() {
                 color: "#64748B",
               }}
             >
-              Showing {filteredHistory.length} of{" "}
-              {history.length} results
+              {t.showing} {filteredHistory.length} {t.of}{" "}
+              {history.length} {t.results}
             </p>
           </div>
         )}
