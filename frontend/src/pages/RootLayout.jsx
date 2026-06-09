@@ -7,13 +7,17 @@ import {
   User,
   Menu,
   X,
+  Languages,
 } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "@/translations/LanguageContext";
 
 export default function RootLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { language, toggleLanguage, t } = useLanguage();
 
   const isActive = (path) => {
     if (path === "/dashboard" && location.pathname === "/dashboard") {
@@ -60,7 +64,7 @@ export default function RootLayout() {
                 }`}
               >
                 <Home className="w-4 h-4" />
-                Home
+                {t.home}
               </button>
 
               <button
@@ -72,7 +76,7 @@ export default function RootLayout() {
                 }`}
               >
                 <History className="w-4 h-4" />
-                History
+                {t.history}
               </button>
 
               <button
@@ -84,11 +88,20 @@ export default function RootLayout() {
                 }`}
               >
                 <HelpCircle className="w-4 h-4" />
-                Help
+                {t.help}
               </button>
             </div>
 
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={toggleLanguage}
+                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
+              >
+                <Languages className="w-4 h-4" />
+                {language === "en" ? "ES" : "EN"}
+              </button>
+
               <div className="hidden sm:flex items-center gap-3">
                 <div className="hidden lg:block text-right">
                   <p className="text-sm font-medium text-slate-800">
@@ -129,7 +142,7 @@ export default function RootLayout() {
                   }`}
                 >
                   <Home className="w-5 h-5" />
-                  Home
+                  {t.home}
                 </button>
 
                 <button
@@ -141,7 +154,7 @@ export default function RootLayout() {
                   }`}
                 >
                   <History className="w-5 h-5" />
-                  History
+                  {t.history}
                 </button>
 
                 <button
@@ -153,7 +166,16 @@ export default function RootLayout() {
                   }`}
                 >
                   <HelpCircle className="w-5 h-5" />
-                  Help
+                  {t.help}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={toggleLanguage}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-slate-500 hover:bg-blue-50 hover:text-blue-600"
+                >
+                  <Languages className="w-5 h-5" />
+                  {language === "en" ? "Cambiar a español" : "Switch to English"}
                 </button>
 
                 <div className="sm:hidden mt-4 pt-4 border-t px-4 border-slate-200">
