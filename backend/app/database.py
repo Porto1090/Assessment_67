@@ -15,3 +15,4 @@ db = client["ass67_auth_db"]
 
 users_collection = db["users"]
 logs_collection = db["logs"]
+history_collection = db["history"]
