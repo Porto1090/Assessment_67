@@ -1,5 +1,6 @@
 <a id="readme-top"></a>
-# Assessment67 - Plataforma de Ciber-Forense con un Compilador Dedicado e Inteligencia Artificial Híbrida
+# Assessment67
+## Plataforma de Ciber-Forense con un Compilador Dedicado e Inteligencia Artificial Híbrida
 
 <p align="center">
   <a href="#infraestructura">Infraestructura</a> •
@@ -7,10 +8,6 @@
   <a href="#ciencias-computacionales">Ciencias Computacionales</a> •
   <a href="#instalación">Instalación</a>
 </p>
-
-<div style="display: block; margin: 0 auto; text-align: center;">
-  <img src="images/Assessment67.jpeg" alt="Assessment67" style="center; padding: 0 0 20px 0; width: 250px; height: auto;"/>
-</div>
 
 ## Abstract
 
@@ -193,7 +190,7 @@ Se desarrolló un lenguaje de dominio específico diseñado exclusivamente para 
 [ ] Por definir tareas específicas.
 
 > [!IMPORTANT]
-> Nota de Gestión: El detalle del progreso diario, la asignación de tasks individuales y la trazabilidad de los commits asociados a cada requerimiento pueden ser consultados en la pestaña de Projects de este repositorio.
+> **Nota de Gestión:** El detalle del progreso diario, la asignación de tasks individuales y la trazabilidad de los commits asociados a cada requerimiento pueden ser consultados en la pestaña de Projects de este repositorio.
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
