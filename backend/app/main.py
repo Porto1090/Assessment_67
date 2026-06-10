@@ -3,7 +3,7 @@
 # Using FastAPI to create a simple authentication API with MongoDB as the database
 
 from fastapi import FastAPI
-from routers import users, compiler
+from app.routers import users, compiler
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 
