@@ -11,4 +11,3 @@ pip install -r requirements.txt
 ```sh
 cd .\app\
 uvicorn main:app --reload
-```
