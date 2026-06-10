@@ -11,7 +11,7 @@ import os
 import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from database import users_collection, logs_collection
+from api.database import users_collection, logs_collection
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
