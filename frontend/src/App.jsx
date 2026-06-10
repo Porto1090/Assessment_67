@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import Login from "@/pages/Login";
+import CreateAccount from "@/pages/CreateAccount";
 import Dashboard from "@/pages/Dashboard";
 import History from "@/pages/History";
 import Help from "@/pages/Help";
@@ -11,10 +12,16 @@ import RootLayout from "@/pages/RootLayout";
 export default function AppRouter() {
   return (
     <Routes>
+
       {/* Públicas */}
       <Route path="/login" element={<Login />} />
 
-      {/* Área principal de CipherVision */}
+      <Route
+        path="/create-account"
+        element={<CreateAccount />}
+      />
+
+      {/* Área principal */}
       <Route element={<RootLayout />}>
         <Route
           path="/"
@@ -37,7 +44,6 @@ export default function AppRouter() {
         />
       </Route>
 
-      {/* 404 */}
       <Route
         path="*"
         element={<NotFound />}
