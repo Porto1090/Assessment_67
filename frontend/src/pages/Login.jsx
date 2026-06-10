@@ -1,198 +1,127 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Eye,
-  EyeOff,
-  Shield,
-  Languages,
-  Sun,
-  Moon,
-} from "lucide-react";
-
+import { Eye, EyeOff, Shield } from "lucide-react";
 import Button from "@/components/Button";
+import { useAuth } from "@/hooks/useAuth";
+import { Navigate } from "react-router-dom";
+import { useAuthContext } from "@/context/AuthContext";
 import { useLanguage } from "@/translations/LanguageContext";
-import { useTheme } from "@/theme/ThemeContext";
 
 export default function Login() {
   const navigate = useNavigate();
-
-  const { language, toggleLanguage } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
-
-  const isDark = theme === "dark";
-
+  const { t } = useLanguage();
+  const { isAuthenticated } = useAuthContext();
+  const { login, loading, error: authError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const [formData, setFormData] = useState({
-    userName: "",
+    username: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
 
-  const t = {
-    en: {
-      title: "Welcome Back",
-      subtitle: "Sign in to continue using CipherVision.",
-      username: "Username",
-      usernamePlaceholder: "Enter your username",
-      password: "Password",
-      passwordPlaceholder: "Enter your password",
-      signIn: "Sign In",
-      createAccount: "Create Account",
-      usernameRequired: "Username is required",
-      passwordRequired: "Password is required",
-    },
-
-    es: {
-      title: "Bienvenido",
-      subtitle: "Inicia sesión para continuar usando CipherVision.",
-      username: "Usuario",
-      usernamePlaceholder: "Ingresa tu usuario",
-      password: "Contraseña",
-      passwordPlaceholder: "Ingresa tu contraseña",
-      signIn: "Iniciar Sesión",
-      createAccount: "Crear Cuenta",
-      usernameRequired: "El usuario es obligatorio",
-      passwordRequired: "La contraseña es obligatoria",
-    },
-  }[language];
-
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.userName.trim()) {
-      newErrors.userName = t.usernameRequired;
+    if (!formData.username.trim()) {
+      newErrors.username = t.login.usernameRequired;
     }
 
     if (!formData.password) {
-      newErrors.password = t.passwordRequired;
+      newErrors.password = t.login.passwordRequired;
     }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (!validateForm()) return;
+
+    const result = await login(formData);
+
+    if (result.success) {
       navigate("/dashboard");
     }
   };
 
   const handleChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
     if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
   return (
-    <div
-      className={`min-h-screen flex items-center justify-center px-4 relative ${
-        isDark ? "bg-slate-900" : "bg-slate-50"
-      }`}
-    >
-      {/* Top Right Controls */}
-      <div className="absolute top-5 right-5 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={toggleLanguage}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium ${
-            isDark
-              ? "border-slate-700 text-slate-300"
-              : "border-slate-200 text-slate-600"
-          }`}
-        >
-          <Languages className="w-4 h-4" />
-          {language === "en" ? "EN" : "ES"}
-        </button>
-
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium ${
-            isDark
-              ? "border-slate-700 text-slate-300"
-              : "border-slate-200 text-slate-600"
-          }`}
-        >
-          {isDark ? (
-            <Moon className="w-4 h-4" />
-          ) : (
-            <Sun className="w-4 h-4" />
-          )}
-
-          {isDark ? "Dark" : "Light"}
-        </button>
-      </div>
-
+    <div className="h-full flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <div
-          className={`rounded-2xl shadow-lg p-8 ${
-            isDark ? "bg-slate-800" : "bg-white"
-          }`}
-        >
+        <div className="bg-white dark:bg-slate-950 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 p-8">
+
           <div className="flex justify-center mb-6">
             <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500">
               <Shield className="w-8 h-8 text-white" />
             </div>
           </div>
 
-          <h1
-            className={`text-center mb-2 text-3xl font-bold ${
-              isDark ? "text-white" : "text-slate-800"
-            }`}
-          >
-            {t.title}
+          <h1 className="text-center mb-2 text-3xl font-bold text-slate-800 dark:text-white">
+            {t.login.title}
           </h1>
 
-          <p
-            className={`text-center mb-8 text-sm ${
-              isDark ? "text-slate-300" : "text-slate-500"
-            }`}
-          >
-            {t.subtitle}
+          <p className="text-center mb-8 text-sm text-slate-500 dark:text-slate-400">
+            {t.login.subtitle}
           </p>
+
+          {authError && (
+            <p className="mb-4 text-sm text-center text-red-500 bg-red-50 dark:bg-red-950/20 py-2 px-4 rounded-lg">
+              {authError}
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label
-                htmlFor="userName"
-                className={`block mb-2 text-sm font-medium ${
-                  isDark ? "text-white" : "text-slate-800"
-                }`}
+                htmlFor="username"
+                className="block mb-2 text-sm font-medium text-slate-800 dark:text-slate-200"
               >
-                {t.username}
+                {t.login.usernameEmailLabel}
               </label>
 
               <input
-                id="userName"
+                id="username"
                 type="text"
-                value={formData.userName}
-                onChange={(e) =>
-                  handleChange("userName", e.target.value)
-                }
-                placeholder={t.usernamePlaceholder}
-                className={`w-full px-4 py-3 rounded-lg border outline-none ${
-                  isDark
-                    ? "bg-slate-900 border-slate-700 text-white"
-                    : "bg-white border-slate-200 text-slate-800"
-                }`}
+                value={formData.username}
+                onChange={(e) => handleChange("username", e.target.value)}
+                placeholder={t.login.usernameEmailPlaceholder}
+                className="
+                  w-full
+                  px-4
+                  py-3
+                  rounded-lg
+                  border
+                  outline-none
+                  bg-white
+                  dark:bg-slate-900
+                  text-slate-900
+                  dark:text-white
+                  placeholder:text-slate-400
+                  dark:placeholder:text-slate-500
+                "
+                style={{
+                  borderColor: errors.username ? "#EF4444" : "#E2E8F0",
+                }}
               />
 
-              {errors.userName && (
+              {errors.username && (
                 <p className="mt-1 text-xs text-red-500">
-                  {errors.userName}
+                  {errors.username}
                 </p>
               )}
             </div>
@@ -200,11 +129,9 @@ export default function Login() {
             <div>
               <label
                 htmlFor="password"
-                className={`block mb-2 text-sm font-medium ${
-                  isDark ? "text-white" : "text-slate-800"
-                }`}
+                className="block mb-2 text-sm font-medium text-slate-800 dark:text-slate-200"
               >
-                {t.password}
+                {t.login.passwordLabel}
               </label>
 
               <div className="relative">
@@ -212,28 +139,46 @@ export default function Login() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) =>
-                    handleChange("password", e.target.value)
-                  }
-                  placeholder={t.passwordPlaceholder}
-                  className={`w-full px-4 py-3 rounded-lg border outline-none pr-12 ${
-                    isDark
-                      ? "bg-slate-900 border-slate-700 text-white"
-                      : "bg-white border-slate-200 text-slate-800"
-                  }`}
+                  onChange={(e) => handleChange("password", e.target.value)}
+                  placeholder={t.login.passwordPlaceholder}
+                  className="
+                    w-full
+                    px-4
+                    py-3
+                    pr-12
+                    rounded-lg
+                    border
+                    outline-none
+                    bg-white
+                    dark:bg-slate-900
+                    text-slate-900
+                    dark:text-white
+                    placeholder:text-slate-400
+                    dark:placeholder:text-slate-500
+                  "
+                  style={{
+                    borderColor: errors.password ? "#EF4444" : "#E2E8F0",
+                  }}
                 />
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="
+                    absolute
+                    right-3
+                    top-1/2
+                    -translate-y-1/2
+                    p-1
+                    rounded-md
+                    hover:bg-slate-100
+                    dark:hover:bg-slate-800
+                  "
                 >
                   {showPassword ? (
-                    <EyeOff className="w-5 h-5 text-slate-400" />
+                    <EyeOff className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                   ) : (
-                    <Eye className="w-5 h-5 text-slate-400" />
+                    <Eye className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                   )}
                 </button>
               </div>
@@ -245,8 +190,13 @@ export default function Login() {
               )}
             </div>
 
-            <Button type="submit" variant="primary" fullWidth>
-              {t.signIn}
+            <Button
+              type="submit"
+              variant="primary"
+              fullWidth
+              disabled={loading}
+            >
+              {loading ? t.login.signingin : t.login.signin}
             </Button>
 
             <Button
@@ -255,7 +205,7 @@ export default function Login() {
               fullWidth
               onClick={() => navigate("/create-account")}
             >
-              {t.createAccount}
+              {t.login.createAccount}
             </Button>
           </form>
         </div>
