@@ -10,14 +10,17 @@ import {
   Download,
   Home,
 } from "lucide-react";
+
 import Button from "@/components/Button";
 import Documentation from "@/sections/home/Documentation.jsx";
 import { useLanguage } from "@/translations/LanguageContext";
 import { useTheme } from "@/theme/ThemeContext";
+import { useAnalyzeModel } from "@/hooks/useAnalyzeModel";
 
 export default function Dashboard() {
   const { t } = useLanguage();
   const { theme } = useTheme();
+  const { analyzeImageRequest, analyzeCodeRequest } = useAnalyzeModel();
 
   const isDark = theme === "dark";
 
@@ -26,7 +29,9 @@ export default function Dashboard() {
   const [result, setResult] = useState(null);
   const [fileName, setFileName] = useState("");
   const [progress, setProgress] = useState(0);
-  const [loadingMessage, setLoadingMessage] = useState("Initializing analysis...");
+  const [loadingMessage, setLoadingMessage] = useState(
+    "Initializing analysis..."
+  );
 
   const [code, setCode] = useState(`
 int suma(int a, int b) {
@@ -163,28 +168,66 @@ int main() {
     setStage("loading");
   };
 
-  const finishAnalysis = () => {
-    if (mode === "image") {
-      const file = pendingFileRef.current;
-      const detected = Math.random() > 0.35;
-      const model = detected ? "CNN" : "SVM";
-      const confidence = detected ? 82 : 37;
+  const finishAnalysis = async () => {
+    try {
+      if (mode === "image") {
+        const file = pendingFileRef.current;
+
+        if (!file) {
+          throw new Error("No image selected");
+        }
+
+        const backendResponse = await analyzeImageRequest(file);
+
+        const analysisResult = {
+          type: "image",
+          detected: backendResponse.detected ?? false,
+          model: backendResponse.model ?? "CNN",
+          confidence: backendResponse.confidence ?? 0,
+          duration: backendResponse.duration ?? "N/A",
+          timestamp: new Date().toLocaleString(),
+          message: backendResponse.message ?? null,
+          explanation: backendResponse.explanation ?? null,
+          reasons: backendResponse.reasons ?? [
+            "No encrypted content present",
+            "Image quality too low",
+            "Unsupported encoding method",
+            "Compression altered hidden data",
+          ],
+        };
+
+        setResult(analysisResult);
+        setStage("done");
+
+        saveToHistory({
+          fileName: file.name,
+          model: analysisResult.model,
+          detected: analysisResult.detected,
+          confidence: analysisResult.confidence,
+          type: "Image",
+        });
+
+        return;
+      }
+
+      const backendResponse = await analyzeCodeRequest(code);
 
       const analysisResult = {
-        type: "image",
-        detected,
-        model,
-        confidence,
-        duration: detected ? "5.6s" : "6.3s",
+        type: "code",
+        detected: backendResponse.detected ?? false,
+        model: backendResponse.model ?? "Code Analyzer",
+        confidence: backendResponse.confidence ?? 0,
+        duration: backendResponse.duration ?? "N/A",
         timestamp: new Date().toLocaleString(),
-        message: detected
-          ? "The secret lies beneath the surface. Trust no one, verify everything."
-          : null,
-        reasons: [
-          "No encrypted content present",
-          "Image quality too low",
-          "Unsupported encoding method",
-          "Compression altered hidden data",
+        message: backendResponse.message ?? null,
+        explanation:
+          backendResponse.explanation ??
+          "No explanation returned from backend.",
+        reasons: backendResponse.reasons ?? [
+          "No suspicious encoded logic found",
+          "No hidden execution pattern detected",
+          "No unusual compiler behavior identified",
+          "Source structure appears valid",
         ],
       };
 
@@ -192,52 +235,35 @@ int main() {
       setStage("done");
 
       saveToHistory({
-        fileName: file?.name || "uploaded-image.jpg",
-        model,
-        detected,
-        confidence,
-        type: "Image",
+        fileName: "source-code-analysis.c",
+        model: analysisResult.model,
+        detected: analysisResult.detected,
+        confidence: analysisResult.confidence,
+        type: "Code",
       });
+    } catch (error) {
+      console.error("Backend error:", error);
 
-      return;
+      const analysisResult = {
+        type: mode,
+        detected: false,
+        model: mode === "image" ? "CNN" : "Code Analyzer",
+        confidence: 0,
+        duration: "N/A",
+        timestamp: new Date().toLocaleString(),
+        message: null,
+        explanation:
+          "The backend could not process the request. Please check the server connection.",
+        reasons: [
+          "Backend server is not available",
+          "API URL is not configured correctly",
+          "Request failed",
+        ],
+      };
+
+      setResult(analysisResult);
+      setStage("done");
     }
-
-    const detected =
-      code.includes("return") || code.includes("suma") || code.includes("if");
-
-    const confidence = detected ? 88 : 42;
-
-    const analysisResult = {
-      type: "code",
-      detected,
-      model: "Code Analyzer",
-      confidence,
-      duration: detected ? "4.8s" : "5.1s",
-      timestamp: new Date().toLocaleString(),
-      message: detected
-        ? "Hidden logic detected inside the source code structure."
-        : null,
-      explanation: detected
-        ? "The analyzer found conditional logic, function calls, and return statements that may contain hidden behavior or encoded execution patterns."
-        : "No suspicious logic, encoded patterns, or hidden execution behavior were detected in the submitted source code.",
-      reasons: [
-        "No suspicious encoded logic found",
-        "No hidden execution pattern detected",
-        "No unusual compiler behavior identified",
-        "Source structure appears valid",
-      ],
-    };
-
-    setResult(analysisResult);
-    setStage("done");
-
-    saveToHistory({
-      fileName: "source-code-analysis.c",
-      model: "Code Analyzer",
-      detected,
-      confidence,
-      type: "Code",
-    });
   };
 
   const handleFileInputChange = (e) => {
@@ -299,7 +325,9 @@ ${result.explanation || "No hidden message detected."}`
         <section className="px-6 sm:px-10 lg:px-12 py-7">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
-              <h1 className={`text-4xl lg:text-6xl font-bold mb-6 leading-tight ${titleText}`}>
+              <h1
+                className={`text-4xl lg:text-6xl font-bold mb-6 leading-tight ${titleText}`}
+              >
                 {t.dashboardTitle}
               </h1>
 
@@ -309,7 +337,9 @@ ${result.explanation || "No hidden message detected."}`
             </div>
 
             <div className="max-w-xl mx-auto mb-8">
-              <div className={`grid grid-cols-2 gap-2 p-2 rounded-xl border ${border} ${cardBg} shadow-sm`}>
+              <div
+                className={`grid grid-cols-2 gap-2 p-2 rounded-xl border ${border} ${cardBg} shadow-sm`}
+              >
                 <button
                   type="button"
                   onClick={() => changeMode("image")}
@@ -354,7 +384,11 @@ ${result.explanation || "No hidden message detected."}`
                 className={`border-2 border-dashed ${border} ${cardBg} rounded-2xl p-12 lg:p-16 text-center cursor-pointer transition-all hover:border-blue-500`}
               >
                 <div className="flex justify-center mb-6">
-                  <div className={`flex items-center justify-center w-24 h-24 rounded-full ${isDark ? "bg-blue-500/10" : "bg-blue-50"}`}>
+                  <div
+                    className={`flex items-center justify-center w-24 h-24 rounded-full ${
+                      isDark ? "bg-blue-500/10" : "bg-blue-50"
+                    }`}
+                  >
                     <Upload className="w-12 h-12 text-blue-600" />
                   </div>
                 </div>
@@ -363,7 +397,9 @@ ${result.explanation || "No hidden message detected."}`
                   Drag & Drop your image here
                 </h2>
 
-                <p className={`${bodyText} mb-8`}>or click to browse files</p>
+                <p className={`${bodyText} mb-8`}>
+                  or click to browse files
+                </p>
 
                 <Button
                   variant="primary"
@@ -399,12 +435,17 @@ ${result.explanation || "No hidden message detected."}`
             )}
 
             {stage === "idle" && mode === "code" && (
-              <div className={`rounded-2xl overflow-hidden shadow-lg border ${border} ${cardBg}`}>
-                <div className={`flex items-center justify-between px-5 py-4 border-b ${border} ${softBg}`}>
+              <div
+                className={`rounded-2xl overflow-hidden shadow-lg border ${border} ${cardBg}`}
+              >
+                <div
+                  className={`flex items-center justify-between px-5 py-4 border-b ${border} ${softBg}`}
+                >
                   <div>
                     <h2 className={`font-bold ${titleText}`}>
                       Source Code Analyzer
                     </h2>
+
                     <p className={`text-sm ${bodyText}`}>
                       Paste or write your code below.
                     </p>
@@ -437,14 +478,20 @@ ${result.explanation || "No hidden message detected."}`
             )}
 
             {stage === "loading" && (
-              <div className={`${cardBg} rounded-2xl shadow-lg p-12 text-center max-w-xl mx-auto`}>
+              <div
+                className={`${cardBg} rounded-2xl shadow-lg p-12 text-center max-w-xl mx-auto`}
+              >
                 <Loader2 className="w-14 h-14 text-blue-600 animate-spin mx-auto mb-8" />
 
                 <h2 className={`text-2xl font-bold mb-6 ${titleText}`}>
                   Analyzing Your {mode === "image" ? "Image" : "Code"}
                 </h2>
 
-                <div className={`w-full ${isDark ? "bg-slate-700" : "bg-slate-200"} rounded-full h-2 overflow-hidden mb-3`}>
+                <div
+                  className={`w-full ${
+                    isDark ? "bg-slate-700" : "bg-slate-200"
+                  } rounded-full h-2 overflow-hidden mb-3`}
+                >
                   <div
                     className="bg-blue-600 h-full rounded-full transition-all duration-300"
                     style={{ width: `${progress}%` }}
@@ -460,13 +507,17 @@ ${result.explanation || "No hidden message detected."}`
             )}
 
             {stage === "done" && result && result.detected && (
-              <div className={`${cardBg} rounded-2xl shadow-lg p-8 max-w-3xl mx-auto`}>
+              <div
+                className={`${cardBg} rounded-2xl shadow-lg p-8 max-w-3xl mx-auto`}
+              >
                 <div className="flex justify-center mb-8">
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${
-                    isDark
-                      ? "bg-green-500/10 text-green-400"
-                      : "bg-green-100 text-green-700"
-                  }`}>
+                  <div
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${
+                      isDark
+                        ? "bg-green-500/10 text-green-400"
+                        : "bg-green-100 text-green-700"
+                    }`}
+                  >
                     <CheckCircle2 className="w-5 h-5" />
                     {result.type === "image"
                       ? "Encrypted Message Detected"
@@ -481,7 +532,11 @@ ${result.explanation || "No hidden message detected."}`
                       : "Detection Explanation"}
                   </h3>
 
-                  <div className={`border-2 border-cyan-400 ${softBg} rounded-xl p-6 leading-7 ${isDark ? "text-slate-200" : "text-slate-700"}`}>
+                  <div
+                    className={`border-2 border-cyan-400 ${softBg} rounded-xl p-6 leading-7 ${
+                      isDark ? "text-slate-200" : "text-slate-700"
+                    }`}
+                  >
                     "{result.message || result.explanation}"
                   </div>
                 </div>
@@ -489,6 +544,7 @@ ${result.explanation || "No hidden message detected."}`
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                   <div className={`${softBg} rounded-lg p-5`}>
                     <p className={`text-sm mb-2 ${bodyText}`}>Model Used</p>
+
                     <p className={`text-xl font-bold ${titleText}`}>
                       {result.model}
                     </p>
@@ -500,7 +556,11 @@ ${result.explanation || "No hidden message detected."}`
                     </p>
 
                     <div className="flex items-center gap-4">
-                      <div className={`flex-1 ${isDark ? "bg-slate-700" : "bg-slate-200"} h-2 rounded-full overflow-hidden`}>
+                      <div
+                        className={`flex-1 ${
+                          isDark ? "bg-slate-700" : "bg-slate-200"
+                        } h-2 rounded-full overflow-hidden`}
+                      >
                         <div
                           className="h-full bg-green-500 rounded-full"
                           style={{ width: `${result.confidence}%` }}
@@ -519,6 +579,7 @@ ${result.explanation || "No hidden message detected."}`
                     <p className={`text-sm mb-2 ${bodyText}`}>
                       Analysis Timestamp
                     </p>
+
                     <p className={`font-medium ${titleText}`}>
                       {result.timestamp}
                     </p>
@@ -528,6 +589,7 @@ ${result.explanation || "No hidden message detected."}`
                     <p className={`text-sm mb-2 ${bodyText}`}>
                       Processing Duration
                     </p>
+
                     <p className={`font-medium ${titleText}`}>
                       {result.duration}
                     </p>
@@ -559,13 +621,17 @@ ${result.explanation || "No hidden message detected."}`
             )}
 
             {stage === "done" && result && !result.detected && (
-              <div className={`${cardBg} rounded-2xl shadow-lg p-8 max-w-3xl mx-auto`}>
+              <div
+                className={`${cardBg} rounded-2xl shadow-lg p-8 max-w-3xl mx-auto`}
+              >
                 <div className="flex justify-center mb-8">
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${
-                    isDark
-                      ? "bg-red-500/10 text-red-400"
-                      : "bg-red-100 text-red-700"
-                  }`}>
+                  <div
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${
+                      isDark
+                        ? "bg-red-500/10 text-red-400"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
                     <XCircle className="w-5 h-5" />
                     No Hidden Message Detected
                   </div>
@@ -592,11 +658,13 @@ ${result.explanation || "No hidden message detected."}`
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
                   <div className={`${softBg} rounded-lg p-5`}>
                     <p className={`text-sm mb-2 ${bodyText}`}>Model Used</p>
+
                     <p className={`font-bold ${titleText}`}>{result.model}</p>
                   </div>
 
                   <div className={`${softBg} rounded-lg p-5`}>
                     <p className={`text-sm mb-2 ${bodyText}`}>Confidence</p>
+
                     <p className={`font-bold ${titleText}`}>
                       {result.confidence}%
                     </p>
@@ -604,6 +672,7 @@ ${result.explanation || "No hidden message detected."}`
 
                   <div className={`${softBg} rounded-lg p-5`}>
                     <p className={`text-sm mb-2 ${bodyText}`}>Duration</p>
+
                     <p className={`font-bold ${titleText}`}>
                       {result.duration}
                     </p>
@@ -636,7 +705,9 @@ ${result.explanation || "No hidden message detected."}`
           </div>
         </section>
 
-        <aside className={`border-l ${border} ${pageBg} px-8 py-12 overflow-y-auto`}>
+        <aside
+          className={`border-l ${border} ${pageBg} px-8 py-12 overflow-y-auto`}
+        >
           <Documentation />
         </aside>
       </div>
