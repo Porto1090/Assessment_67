@@ -6,12 +6,15 @@ import App from "@/App.jsx";
 import "@/styles/index.css";
 
 import { LanguageProvider } from "@/translations/LanguageContext";
+import { ThemeProvider } from "@/theme/ThemeContext";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <LanguageProvider>
-        <App />
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
       </LanguageProvider>
     </BrowserRouter>
   </React.StrictMode>

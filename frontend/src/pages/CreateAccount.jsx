@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Shield } from "lucide-react";
 import Button from "@/components/Button";
 
-export default function Login() {
+export default function CreateAccount() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     userName: "",
+    email: "",
     password: "",
   });
 
@@ -21,8 +22,16 @@ export default function Login() {
       newErrors.userName = "Username is required";
     }
 
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+
     if (!formData.password) {
       newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     setErrors(newErrors);
@@ -62,17 +71,17 @@ export default function Login() {
           </div>
 
           <h1 className="text-center mb-2 text-3xl font-bold text-slate-800">
-            Welcome back
+            Create your account
           </h1>
 
           <p className="text-center mb-8 text-sm text-slate-500">
-            Sign in to continue using CipherVision.
+            Create an account to start analyzing hidden encrypted messages.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="userName" className="block mb-2 text-sm font-medium text-slate-800">
-                Username/Email
+                Username
               </label>
 
               <input
@@ -84,11 +93,33 @@ export default function Login() {
                 style={{
                   borderColor: errors.userName ? "#EF4444" : "#E2E8F0",
                 }}
-                placeholder="Enter your username or email"
+                placeholder="Enter your username"
               />
 
               {errors.userName && (
                 <p className="mt-1 text-xs text-red-500">{errors.userName}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block mb-2 text-sm font-medium text-slate-800">
+                Email Address
+              </label>
+
+              <input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border outline-none"
+                style={{
+                  borderColor: errors.email ? "#EF4444" : "#E2E8F0",
+                }}
+                placeholder="Enter your email"
+              />
+
+              {errors.email && (
+                <p className="mt-1 text-xs text-red-500">{errors.email}</p>
               )}
             </div>
 
@@ -129,16 +160,16 @@ export default function Login() {
             </div>
 
             <Button type="submit" variant="primary" fullWidth>
-              Sign In
+              Create Account
             </Button>
 
             <Button
               type="button"
               variant="outline"
               fullWidth
-              onClick={() => navigate("/create-account")}
+              onClick={() => navigate("/login")}
             >
-              Create Account
+              Back to Sign In
             </Button>
           </form>
         </div>
