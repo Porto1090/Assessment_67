@@ -1,0 +1,35 @@
+name: Deploy Frontend a VM Privada
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'frontend/**'
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Descargar el código más reciente
+        uses: actions/checkout@v3
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Construir la aplicación (Build)
+        run: npm run build
+
+      - name: Mover archivos a la carpeta del servidor web
+        run: |
+          cp -r dist/* /var/www/frontend/
