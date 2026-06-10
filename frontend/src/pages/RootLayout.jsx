@@ -8,9 +8,12 @@ import {
   Menu,
   X,
   Languages,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/translations/LanguageContext";
+import { useTheme } from "@/theme/ThemeContext";
 
 export default function RootLayout() {
   const navigate = useNavigate();
@@ -18,6 +21,7 @@ export default function RootLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { language, toggleLanguage, t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
 
   const isActive = (path) => {
     if (path === "/dashboard" && location.pathname === "/dashboard") {
@@ -36,9 +40,23 @@ export default function RootLayout() {
     setMobileMenuOpen(false);
   };
 
+  const navButtonClass = (path) =>
+    `flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition ${
+      isActive(path)
+        ? "text-blue-500 bg-blue-50 dark:bg-blue-500/10"
+        : "text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+    }`;
+
+  const mobileNavButtonClass = (path) =>
+    `flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition ${
+      isActive(path)
+        ? "text-blue-500 bg-blue-50 dark:bg-blue-500/10"
+        : "text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+    }`;
+
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <nav className="border-b sticky top-0 z-50 bg-white border-slate-200">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
+      <nav className="border-b sticky top-0 z-50 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div
@@ -49,7 +67,7 @@ export default function RootLayout() {
                 <Shield className="w-6 h-6 text-white" />
               </div>
 
-              <span className="hidden sm:block text-xl font-bold text-slate-800">
+              <span className="hidden sm:block text-xl font-bold text-slate-800 dark:text-white">
                 CipherVision
               </span>
             </div>
@@ -57,11 +75,7 @@ export default function RootLayout() {
             <div className="hidden md:flex items-center gap-8">
               <button
                 onClick={() => handleNavigation("/dashboard")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm ${
-                  isActive("/dashboard")
-                    ? "text-blue-500 bg-blue-50"
-                    : "text-slate-500"
-                }`}
+                className={navButtonClass("/dashboard")}
               >
                 <Home className="w-4 h-4" />
                 {t.home}
@@ -69,11 +83,7 @@ export default function RootLayout() {
 
               <button
                 onClick={() => handleNavigation("/history")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm ${
-                  isActive("/history")
-                    ? "text-blue-500 bg-blue-50"
-                    : "text-slate-500"
-                }`}
+                className={navButtonClass("/history")}
               >
                 <History className="w-4 h-4" />
                 {t.history}
@@ -81,11 +91,7 @@ export default function RootLayout() {
 
               <button
                 onClick={() => handleNavigation("/help")}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm ${
-                  isActive("/help")
-                    ? "text-blue-500 bg-blue-50"
-                    : "text-slate-500"
-                }`}
+                className={navButtonClass("/help")}
               >
                 <HelpCircle className="w-4 h-4" />
                 {t.help}
@@ -96,18 +102,31 @@ export default function RootLayout() {
               <button
                 type="button"
                 onClick={toggleLanguage}
-                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition"
+                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 hover:text-blue-600 transition"
               >
                 <Languages className="w-4 h-4" />
-                {language === "en" ? "ES" : "EN"}
+                {language === "en" ? "EN" : "ES"}
+              </button>
+
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 hover:text-blue-600 transition"
+              >
+                {theme === "light" ? (
+                <Sun className="w-4 h-4" />
+                ) : (
+                <Moon className="w-4 h-4" />
+                )}
+                {theme === "light" ? "Light" : "Dark"}
               </button>
 
               <div className="hidden sm:flex items-center gap-3">
                 <div className="hidden lg:block text-right">
-                  <p className="text-sm font-medium text-slate-800">
+                  <p className="text-sm font-medium text-slate-800 dark:text-white">
                     Demo User
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     demo@ciphervision.ai
                   </p>
                 </div>
@@ -119,27 +138,23 @@ export default function RootLayout() {
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
               >
                 {mobileMenuOpen ? (
-                  <X className="w-6 h-6 text-slate-800" />
+                  <X className="w-6 h-6 text-slate-800 dark:text-white" />
                 ) : (
-                  <Menu className="w-6 h-6 text-slate-800" />
+                  <Menu className="w-6 h-6 text-slate-800 dark:text-white" />
                 )}
               </button>
             </div>
           </div>
 
           {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-slate-200">
+            <div className="md:hidden py-4 border-t border-slate-200 dark:border-slate-800">
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => handleNavigation("/dashboard")}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm ${
-                    isActive("/dashboard")
-                      ? "text-blue-500 bg-blue-50"
-                      : "text-slate-500"
-                  }`}
+                  className={mobileNavButtonClass("/dashboard")}
                 >
                   <Home className="w-5 h-5" />
                   {t.home}
@@ -147,11 +162,7 @@ export default function RootLayout() {
 
                 <button
                   onClick={() => handleNavigation("/history")}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm ${
-                    isActive("/history")
-                      ? "text-blue-500 bg-blue-50"
-                      : "text-slate-500"
-                  }`}
+                  className={mobileNavButtonClass("/history")}
                 >
                   <History className="w-5 h-5" />
                   {t.history}
@@ -159,11 +170,7 @@ export default function RootLayout() {
 
                 <button
                   onClick={() => handleNavigation("/help")}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm ${
-                    isActive("/help")
-                      ? "text-blue-500 bg-blue-50"
-                      : "text-slate-500"
-                  }`}
+                  className={mobileNavButtonClass("/help")}
                 >
                   <HelpCircle className="w-5 h-5" />
                   {t.help}
@@ -172,23 +179,36 @@ export default function RootLayout() {
                 <button
                   type="button"
                   onClick={toggleLanguage}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-slate-500 hover:bg-blue-50 hover:text-blue-600"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-slate-500 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 hover:text-blue-600"
                 >
                   <Languages className="w-5 h-5" />
-                  {language === "en" ? "Cambiar a español" : "Switch to English"}
+                  {language === "en" ? "English" : "Español"}
                 </button>
 
-                <div className="sm:hidden mt-4 pt-4 border-t px-4 border-slate-200">
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm text-slate-500 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 hover:text-blue-600"
+                >
+                 {theme === "light" ? (
+                 <Sun className="w-5 h-5" />
+                 ) : (
+                 <Moon className="w-5 h-5" />
+                 )}
+                 {theme === "light" ? "Light" : "Dark"}
+                </button>
+
+                <div className="sm:hidden mt-4 pt-4 border-t px-4 border-slate-200 dark:border-slate-800">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-500">
                       <User className="w-5 h-5 text-white" />
                     </div>
 
                     <div>
-                      <p className="text-sm font-medium text-slate-800">
+                      <p className="text-sm font-medium text-slate-800 dark:text-white">
                         Demo User
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         demo@ciphervision.ai
                       </p>
                     </div>
@@ -200,13 +220,13 @@ export default function RootLayout() {
         </div>
       </nav>
 
-      <main className="flex-1 bg-slate-50">
+      <main className="flex-1 bg-slate-50 dark:bg-slate-900">
         <Outlet />
       </main>
 
-      <footer className="border-t mt-auto bg-white border-slate-200">
+      <footer className="border-t mt-auto bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 py-6 text-center">
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             © 2026 CipherVision AI. All rights reserved.
           </p>
         </div>

@@ -1,8 +1,12 @@
 import { FileImage, Brain, HelpCircle, Shield } from "lucide-react";
 import { useLanguage } from "@/translations/LanguageContext";
+import { useTheme } from "@/theme/ThemeContext";
 
 export default function Help() {
   const { language } = useLanguage();
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
 
   const content = {
     en: {
@@ -98,62 +102,44 @@ export default function Help() {
 
   const t = content[language];
 
+  const pageBg = isDark ? "bg-slate-900" : "bg-slate-50";
+  const cardBg = isDark ? "bg-slate-800" : "bg-white";
+  const softBg = isDark ? "bg-slate-900" : "bg-slate-50";
+  const iconBg = isDark ? "bg-blue-500/10" : "bg-blue-50";
+  const titleText = isDark ? "text-white" : "text-slate-800";
+  const bodyText = isDark ? "text-slate-300" : "text-slate-500";
+  const mediumText = isDark ? "text-slate-300" : "text-slate-700";
+  const border = isDark ? "border-slate-700" : "border-transparent";
+
+  const cardClass = `${cardBg} rounded-xl shadow-sm p-8 mb-6 border ${border}`;
+  const iconBoxClass = `flex items-center justify-center w-12 h-12 rounded-lg flex-shrink-0 ${iconBg}`;
+  const smallCardClass = `p-4 rounded-lg ${softBg}`;
+
   return (
-    <div
-      className="min-h-[calc(100vh-64px)] py-12"
-      style={{ backgroundColor: "#F8FAFC" }}
-    >
+    <div className={`min-h-[calc(100vh-64px)] py-12 ${pageBg}`}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1
-            className="mb-3"
-            style={{
-              fontSize: "36px",
-              fontWeight: 700,
-              color: "#1E293B",
-            }}
-          >
+          <h1 className={`mb-3 text-4xl font-bold ${titleText}`}>
             {t.title}
           </h1>
 
-          <p
-            style={{
-              fontSize: "16px",
-              color: "#64748B",
-            }}
-          >
+          <p className={`text-base ${bodyText}`}>
             {t.subtitle}
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
+        <div className={cardClass}>
           <div className="flex items-start gap-4 mb-4">
-            <div
-              className="flex items-center justify-center w-12 h-12 rounded-lg flex-shrink-0"
-              style={{ backgroundColor: "#EFF6FF" }}
-            >
-              <Brain className="w-6 h-6" style={{ color: "#3B82F6" }} />
+            <div className={iconBoxClass}>
+              <Brain className="w-6 h-6 text-blue-600" />
             </div>
 
             <div>
-              <h2
-                className="mb-2"
-                style={{
-                  fontSize: "24px",
-                  fontWeight: 700,
-                  color: "#1E293B",
-                }}
-              >
+              <h2 className={`mb-2 text-2xl font-bold ${titleText}`}>
                 {t.howItWorks}
               </h2>
 
-              <p
-                style={{
-                  fontSize: "14px",
-                  color: "#64748B",
-                  lineHeight: "1.6",
-                }}
-              >
+              <p className={`text-sm leading-6 ${bodyText}`}>
                 {t.howItWorksText}
               </p>
             </div>
@@ -166,28 +152,12 @@ export default function Help() {
               [t.extractionTitle, t.extractionText],
               [t.resultsTitle, t.resultsText],
             ].map(([title, text]) => (
-              <div
-                key={title}
-                className="p-4 rounded-lg"
-                style={{ backgroundColor: "#F8FAFC" }}
-              >
-                <h3
-                  className="mb-2"
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    color: "#1E293B",
-                  }}
-                >
+              <div key={title} className={smallCardClass}>
+                <h3 className={`mb-2 text-base font-semibold ${titleText}`}>
                   {title}
                 </h3>
 
-                <p
-                  style={{
-                    fontSize: "14px",
-                    color: "#64748B",
-                  }}
-                >
+                <p className={`text-sm ${bodyText}`}>
                   {text}
                 </p>
               </div>
@@ -195,65 +165,53 @@ export default function Help() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
+        <div className={cardClass}>
           <div className="flex items-start gap-4 mb-4">
-            <div
-              className="flex items-center justify-center w-12 h-12 rounded-lg"
-              style={{ backgroundColor: "#EFF6FF" }}
-            >
-              <FileImage className="w-6 h-6" style={{ color: "#3B82F6" }} />
+            <div className={iconBoxClass}>
+              <FileImage className="w-6 h-6 text-blue-600" />
             </div>
 
             <div>
-              <h2
-                className="mb-2"
-                style={{
-                  fontSize: "24px",
-                  fontWeight: 700,
-                  color: "#1E293B",
-                }}
-              >
+              <h2 className={`mb-2 text-2xl font-bold ${titleText}`}>
                 {t.formatsTitle}
               </h2>
 
-              <p style={{ fontSize: "14px", color: "#64748B" }}>
+              <p className={`text-sm ${bodyText}`}>
                 {t.formatsText}
               </p>
             </div>
           </div>
 
-          <div className="space-y-4 ml-16">
+          <div className={`space-y-4 ml-16 ${mediumText}`}>
             <p>
-              <strong>{t.format}</strong> JPG / JPEG / PNG
+              <strong className={titleText}>{t.format}</strong>{" "}
+              JPG / JPEG / PNG
             </p>
+
             <p>
-              <strong>{t.maxSize}</strong> 10 MB
+              <strong className={titleText}>{t.maxSize}</strong>{" "}
+              10 MB
             </p>
+
             <p>
-              <strong>{t.resolution}</strong> 800x600+
+              <strong className={titleText}>{t.resolution}</strong>{" "}
+              800x600+
             </p>
+
             <p>
-              <strong>{t.quality}</strong> {t.qualityText}
+              <strong className={titleText}>{t.quality}</strong>{" "}
+              {t.qualityText}
             </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
+        <div className={cardClass}>
           <div className="flex items-start gap-4 mb-6">
-            <div
-              className="flex items-center justify-center w-12 h-12 rounded-lg"
-              style={{ backgroundColor: "#EFF6FF" }}
-            >
-              <HelpCircle className="w-6 h-6" style={{ color: "#3B82F6" }} />
+            <div className={iconBoxClass}>
+              <HelpCircle className="w-6 h-6 text-blue-600" />
             </div>
 
-            <h2
-              style={{
-                fontSize: "24px",
-                fontWeight: 700,
-                color: "#1E293B",
-              }}
-            >
+            <h2 className={`text-2xl font-bold ${titleText}`}>
               {t.faq}
             </h2>
           </div>
@@ -267,45 +225,32 @@ export default function Help() {
               [t.q5, t.a5],
             ].map(([question, answer]) => (
               <div key={question}>
-                <h3 className="font-semibold mb-2">{question}</h3>
-                <p className="text-slate-500">{answer}</p>
+                <h3 className={`font-semibold mb-2 ${titleText}`}>
+                  {question}
+                </h3>
+
+                <p className={bodyText}>
+                  {answer}
+                </p>
               </div>
             ))}
           </div>
         </div>
 
         <div
-          className="mt-8 p-6 rounded-xl border"
-          style={{
-            backgroundColor: "#EFF6FF",
-            borderColor: "#3B82F6",
-          }}
+          className={`mt-8 p-6 rounded-xl border border-blue-500 ${
+            isDark ? "bg-blue-500/10" : "bg-blue-50"
+          }`}
         >
           <div className="flex items-start gap-3">
-            <Shield
-              className="w-6 h-6 flex-shrink-0"
-              style={{ color: "#3B82F6" }}
-            />
+            <Shield className="w-6 h-6 flex-shrink-0 text-blue-600" />
 
             <div>
-              <h3
-                className="mb-2"
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 600,
-                  color: "#1E293B",
-                }}
-              >
+              <h3 className={`mb-2 text-base font-semibold ${titleText}`}>
                 {t.securityTitle}
               </h3>
 
-              <p
-                style={{
-                  fontSize: "14px",
-                  color: "#64748B",
-                  lineHeight: "1.6",
-                }}
-              >
+              <p className={`text-sm leading-6 ${bodyText}`}>
                 {t.securityText}
               </p>
             </div>
