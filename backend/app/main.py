@@ -30,7 +30,6 @@ async def root():
 def health():
     return {"status": "ok"}
 
-
 # Para usar Certificados SSL para https con OpenSSL
 # if __name__ == "__main__":
 #     uvicorn.run(

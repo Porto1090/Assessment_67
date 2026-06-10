@@ -20,6 +20,10 @@ export const translations = {
       en: "Light",
       es: "Claro"
     },
+    rights: {
+      en: "© 2026 CipherVision AI. All rights reserved.",
+      es: "© 2026 CipherVision AI. Todos los derechos reservados."
+    }
   },
   history: {
     title: {
@@ -413,5 +417,117 @@ export const translations = {
         es: "CipherVision está pensado para fines educativos y de investigación. Las imágenes se analizan localmente y no se envían a servidores externos." 
       },
     }
+  },
+  login: {
+    usernameAndEmailRequired: {
+      en: "Username or email is required",
+      es: "Se requiere nombre de usuario o correo electrónico"
+    },
+    usernameRequired: {
+      en: "Username is required",
+      es: "Se requiere nombre de usuario"
+    },
+    passwordRequired: {
+      en: "Password is required",
+      es: "Se requiere contraseña"
+    },
+    emailRequired: {
+      en: "Email is required",
+      es: "Se requiere correo electrónico"
+    },
+    invalidEmail: {
+      en: "Please enter a valid email",
+      es: "Por favor, ingresa un correo electrónico válido"
+    },
+    passwordMinLength: {
+      en: "Password must be at least 8 characters",
+      es: "La contraseña debe tener al menos 8 caracteres"
+    },
+    title: {
+      en: "Welcome back",
+      es: "Bienvenido de nuevo"
+    },
+    subtitle: {
+      en: "Sign in to continue using CipherVision.",
+      es: "Inicia sesión para continuar usando CipherVision."
+    },
+    usernameLabel: {
+      en: "Username",
+      es: "Nombre de usuario"
+    },
+    usernamePlaceholder: {
+      en: "Enter your username",
+      es: "Ingresa tu nombre de usuario"
+    },
+    usernameEmailLabel: {
+      en: "Username/Email",
+      es: "Nombre de usuario o email"
+    },
+    emailLabel: {
+      en: "Email Address",
+      es: "Correo electrónico"
+    },
+    emailPlaceholder: {
+      en: "Enter your email",
+      es: "Ingresa tu correo electrónico"
+    },
+    usernameEmailPlaceholder: {
+      en: "Enter your username or email",
+      es: "Ingresa tu nombre de usuario o email"
+    },
+    passwordLabel: {
+      en: "Password",
+      es: "Contraseña"
+    },
+    passwordPlaceholder: {
+      en: "Enter your password",
+      es: "Ingresa tu contraseña"
+    },
+    signin: {
+      en: "Sign In",
+      es: "Iniciar sesión"
+    },
+    signingin: {
+      en: "Signing in...",
+      es: "Iniciando sesión..."
+    },
+    createnewAccount: {
+      en: "Creating account...",
+      es: "Creando cuenta..."
+    },
+    createAccount: {
+      en: "Create Account",
+      es: "Crear Cuenta"
+    },
+    createTitle: {
+      en: "Create your account",
+      es: "Crea tu cuenta"
+    },
+    createSubtitle: {
+      en: "Create an account to start analyzing hidden encrypted messages.",
+      es: "Crea una cuenta para empezar a analizar mensajes cifrados ocultos."
+    },
+    backToLogin: {
+      en: "Back to Sign In",
+      es: "Regresar al Iniciar Sesión"
+    },
+  },
+  logout: {
+    cancel: {
+      en: "Cancel",
+      es: "Cancelar"
+    },
+    logout: {
+      en: "Logout",
+      es: "Cerrar sesión"
+    },
+    title: {
+      en: "Confirm Logout",
+      es: "Confirmar cierre de sesión"
+    },
+    subtitle: {
+      en: "Are you sure you want to log out of your account?",
+      es: "¿Estás seguro de que quieres cerrar sesión en tu cuenta?"
+    },
   }
 };
