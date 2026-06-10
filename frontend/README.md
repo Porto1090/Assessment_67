@@ -1,3 +1,3 @@
 # FRONTEND
 
-TENEMOS CI/CD
+TENEMOS CI/CD ahora si arreglada
