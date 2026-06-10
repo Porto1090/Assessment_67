@@ -296,7 +296,7 @@ ${result.explanation || "No hidden message detected."}`
   return (
     <main className={`min-h-[calc(100vh-64px)] ${pageBg}`}>
       <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] min-h-[calc(100vh-64px)]">
-        <section className="px-6 sm:px-10 lg:px-16 py-14">
+        <section className="px-6 sm:px-10 lg:px-12 py-7">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
               <h1 className={`text-4xl lg:text-6xl font-bold mb-6 leading-tight ${titleText}`}>
