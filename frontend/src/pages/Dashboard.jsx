@@ -13,9 +13,14 @@ import {
 import Button from "@/components/Button";
 import Documentation from "@/sections/home/Documentation.jsx";
 import { useLanguage } from "@/translations/LanguageContext";
+import { useTheme } from "@/theme/ThemeContext";
 
 export default function Dashboard() {
   const { t } = useLanguage();
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
+
   const [mode, setMode] = useState("image");
   const [stage, setStage] = useState("idle");
   const [result, setResult] = useState(null);
@@ -24,7 +29,6 @@ export default function Dashboard() {
   const [loadingMessage, setLoadingMessage] = useState("Initializing analysis...");
 
   const [code, setCode] = useState(`
-
 int suma(int a, int b) {
   int c;
   c = a + b;
@@ -127,9 +131,7 @@ int main() {
       type: data.type,
     };
 
-    const history = JSON.parse(
-      localStorage.getItem("analysisHistory") || "[]"
-    );
+    const history = JSON.parse(localStorage.getItem("analysisHistory") || "[]");
 
     history.unshift(historyItem);
     localStorage.setItem("analysisHistory", JSON.stringify(history));
@@ -284,29 +286,40 @@ ${result.explanation || "No hidden message detected."}`
     URL.revokeObjectURL(url);
   };
 
+  const pageBg = isDark ? "bg-slate-900" : "bg-white";
+  const cardBg = isDark ? "bg-slate-800" : "bg-white";
+  const softBg = isDark ? "bg-slate-900" : "bg-slate-50";
+  const titleText = isDark ? "text-white" : "text-slate-800";
+  const bodyText = isDark ? "text-slate-300" : "text-slate-500";
+  const border = isDark ? "border-slate-700" : "border-slate-200";
+
   return (
-    <main className="min-h-[calc(100vh-64px)] bg-white">
+    <main className={`min-h-[calc(100vh-64px)] ${pageBg}`}>
       <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] min-h-[calc(100vh-64px)]">
         <section className="px-6 sm:px-10 lg:px-16 py-14">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
-              <h1 className="text-4xl lg:text-6xl font-bold text-slate-800 mb-6 leading-tight">
+              <h1 className={`text-4xl lg:text-6xl font-bold mb-6 leading-tight ${titleText}`}>
                 {t.dashboardTitle}
               </h1>
 
-              <p className="text-lg lg:text-xl text-slate-500 max-w-3xl mx-auto">
-                 {t.dashboardSubtitle}
+              <p className={`text-lg lg:text-xl max-w-3xl mx-auto ${bodyText}`}>
+                {t.dashboardSubtitle}
               </p>
             </div>
 
             <div className="max-w-xl mx-auto mb-8">
-              <div className="grid grid-cols-2 gap-2 p-2 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className={`grid grid-cols-2 gap-2 p-2 rounded-xl border ${border} ${cardBg} shadow-sm`}>
                 <button
                   type="button"
                   onClick={() => changeMode("image")}
                   className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
                     mode === "image"
-                      ? "bg-blue-50 text-blue-600 shadow-sm"
+                      ? isDark
+                        ? "bg-blue-500/10 text-blue-400 shadow-sm"
+                        : "bg-blue-50 text-blue-600 shadow-sm"
+                      : isDark
+                      ? "text-slate-300 hover:bg-slate-700"
                       : "text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -319,7 +332,11 @@ ${result.explanation || "No hidden message detected."}`
                   onClick={() => changeMode("code")}
                   className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
                     mode === "code"
-                      ? "bg-blue-50 text-blue-600 shadow-sm"
+                      ? isDark
+                        ? "bg-blue-500/10 text-blue-400 shadow-sm"
+                        : "bg-blue-50 text-blue-600 shadow-sm"
+                      : isDark
+                      ? "text-slate-300 hover:bg-slate-700"
                       : "text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -334,23 +351,19 @@ ${result.explanation || "No hidden message detected."}`
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed rounded-2xl p-12 lg:p-16 text-center cursor-pointer transition-all hover:border-blue-500"
-                style={{
-                  borderColor: "#E2E8F0",
-                  backgroundColor: "#FFFFFF",
-                }}
+                className={`border-2 border-dashed ${border} ${cardBg} rounded-2xl p-12 lg:p-16 text-center cursor-pointer transition-all hover:border-blue-500`}
               >
                 <div className="flex justify-center mb-6">
-                  <div className="flex items-center justify-center w-24 h-24 rounded-full bg-blue-50">
+                  <div className={`flex items-center justify-center w-24 h-24 rounded-full ${isDark ? "bg-blue-500/10" : "bg-blue-50"}`}>
                     <Upload className="w-12 h-12 text-blue-600" />
                   </div>
                 </div>
 
-                <h2 className="text-2xl font-bold text-slate-800 mb-2">
+                <h2 className={`text-2xl font-bold mb-2 ${titleText}`}>
                   Drag & Drop your image here
                 </h2>
 
-                <p className="text-slate-500 mb-8">or click to browse files</p>
+                <p className={`${bodyText} mb-8`}>or click to browse files</p>
 
                 <Button
                   variant="primary"
@@ -366,14 +379,12 @@ ${result.explanation || "No hidden message detected."}`
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-8">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span className="text-slate-500">
-                      JPG/JPEG/PNG supported
-                    </span>
+                    <span className={bodyText}>JPG/JPEG/PNG supported</span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span className="text-slate-500">Maximum 10MB</span>
+                    <span className={bodyText}>Maximum 10MB</span>
                   </div>
                 </div>
 
@@ -388,13 +399,13 @@ ${result.explanation || "No hidden message detected."}`
             )}
 
             {stage === "idle" && mode === "code" && (
-              <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 bg-slate-50">
+              <div className={`rounded-2xl overflow-hidden shadow-lg border ${border} ${cardBg}`}>
+                <div className={`flex items-center justify-between px-5 py-4 border-b ${border} ${softBg}`}>
                   <div>
-                    <h2 className="font-bold text-slate-800">
+                    <h2 className={`font-bold ${titleText}`}>
                       Source Code Analyzer
                     </h2>
-                    <p className="text-sm text-slate-500">
+                    <p className={`text-sm ${bodyText}`}>
                       Paste or write your code below.
                     </p>
                   </div>
@@ -426,21 +437,21 @@ ${result.explanation || "No hidden message detected."}`
             )}
 
             {stage === "loading" && (
-              <div className="bg-white rounded-2xl shadow-lg p-12 text-center max-w-xl mx-auto">
+              <div className={`${cardBg} rounded-2xl shadow-lg p-12 text-center max-w-xl mx-auto`}>
                 <Loader2 className="w-14 h-14 text-blue-600 animate-spin mx-auto mb-8" />
 
-                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                <h2 className={`text-2xl font-bold mb-6 ${titleText}`}>
                   Analyzing Your {mode === "image" ? "Image" : "Code"}
                 </h2>
 
-                <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden mb-3">
+                <div className={`w-full ${isDark ? "bg-slate-700" : "bg-slate-200"} rounded-full h-2 overflow-hidden mb-3`}>
                   <div
                     className="bg-blue-600 h-full rounded-full transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
 
-                <p className="text-sm font-medium text-slate-500 mb-4">
+                <p className={`text-sm font-medium mb-4 ${bodyText}`}>
                   {progress}%
                 </p>
 
@@ -449,9 +460,13 @@ ${result.explanation || "No hidden message detected."}`
             )}
 
             {stage === "done" && result && result.detected && (
-              <div className="bg-white rounded-2xl shadow-lg p-8 max-w-3xl mx-auto">
+              <div className={`${cardBg} rounded-2xl shadow-lg p-8 max-w-3xl mx-auto`}>
                 <div className="flex justify-center mb-8">
-                  <div className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full font-semibold">
+                  <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${
+                    isDark
+                      ? "bg-green-500/10 text-green-400"
+                      : "bg-green-100 text-green-700"
+                  }`}>
                     <CheckCircle2 className="w-5 h-5" />
                     {result.type === "image"
                       ? "Encrypted Message Detected"
@@ -460,39 +475,39 @@ ${result.explanation || "No hidden message detected."}`
                 </div>
 
                 <div className="mb-8">
-                  <h3 className="font-bold text-slate-800 mb-4">
+                  <h3 className={`font-bold mb-4 ${titleText}`}>
                     {result.type === "image"
                       ? "Recovered Message"
                       : "Detection Explanation"}
                   </h3>
 
-                  <div className="border-2 border-cyan-400 bg-slate-50 rounded-xl p-6 text-slate-700 leading-7">
+                  <div className={`border-2 border-cyan-400 ${softBg} rounded-xl p-6 leading-7 ${isDark ? "text-slate-200" : "text-slate-700"}`}>
                     "{result.message || result.explanation}"
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-                  <div className="bg-slate-50 rounded-lg p-5">
-                    <p className="text-sm text-slate-500 mb-2">Model Used</p>
-                    <p className="text-xl font-bold text-slate-800">
+                  <div className={`${softBg} rounded-lg p-5`}>
+                    <p className={`text-sm mb-2 ${bodyText}`}>Model Used</p>
+                    <p className={`text-xl font-bold ${titleText}`}>
                       {result.model}
                     </p>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-5">
-                    <p className="text-sm text-slate-500 mb-2">
+                  <div className={`${softBg} rounded-lg p-5`}>
+                    <p className={`text-sm mb-2 ${bodyText}`}>
                       Confidence Score
                     </p>
 
                     <div className="flex items-center gap-4">
-                      <div className="flex-1 bg-slate-200 h-2 rounded-full overflow-hidden">
+                      <div className={`flex-1 ${isDark ? "bg-slate-700" : "bg-slate-200"} h-2 rounded-full overflow-hidden`}>
                         <div
                           className="h-full bg-green-500 rounded-full"
                           style={{ width: `${result.confidence}%` }}
                         />
                       </div>
 
-                      <p className="text-xl font-bold text-slate-800">
+                      <p className={`text-xl font-bold ${titleText}`}>
                         {result.confidence}%
                       </p>
                     </div>
@@ -500,20 +515,20 @@ ${result.explanation || "No hidden message detected."}`
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-                  <div className="bg-slate-50 rounded-lg p-5">
-                    <p className="text-sm text-slate-500 mb-2">
+                  <div className={`${softBg} rounded-lg p-5`}>
+                    <p className={`text-sm mb-2 ${bodyText}`}>
                       Analysis Timestamp
                     </p>
-                    <p className="font-medium text-slate-800">
+                    <p className={`font-medium ${titleText}`}>
                       {result.timestamp}
                     </p>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-5">
-                    <p className="text-sm text-slate-500 mb-2">
+                  <div className={`${softBg} rounded-lg p-5`}>
+                    <p className={`text-sm mb-2 ${bodyText}`}>
                       Processing Duration
                     </p>
-                    <p className="font-medium text-slate-800">
+                    <p className={`font-medium ${titleText}`}>
                       {result.duration}
                     </p>
                   </div>
@@ -544,16 +559,20 @@ ${result.explanation || "No hidden message detected."}`
             )}
 
             {stage === "done" && result && !result.detected && (
-              <div className="bg-white rounded-2xl shadow-lg p-8 max-w-3xl mx-auto">
+              <div className={`${cardBg} rounded-2xl shadow-lg p-8 max-w-3xl mx-auto`}>
                 <div className="flex justify-center mb-8">
-                  <div className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full font-semibold">
+                  <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold ${
+                    isDark
+                      ? "bg-red-500/10 text-red-400"
+                      : "bg-red-100 text-red-700"
+                  }`}>
                     <XCircle className="w-5 h-5" />
                     No Hidden Message Detected
                   </div>
                 </div>
 
                 <div className="mb-8">
-                  <h3 className="font-bold text-slate-800 mb-4">
+                  <h3 className={`font-bold mb-4 ${titleText}`}>
                     Possible Reasons
                   </h3>
 
@@ -561,9 +580,9 @@ ${result.explanation || "No hidden message detected."}`
                     {result.reasons.map((reason, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-3 bg-slate-50 rounded-lg p-5 text-slate-500"
+                        className={`flex items-center gap-3 ${softBg} rounded-lg p-5 ${bodyText}`}
                       >
-                        <span className="text-slate-500">•</span>
+                        <span>•</span>
                         <span>{reason}</span>
                       </div>
                     ))}
@@ -571,21 +590,21 @@ ${result.explanation || "No hidden message detected."}`
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-                  <div className="bg-slate-50 rounded-lg p-5">
-                    <p className="text-sm text-slate-500 mb-2">Model Used</p>
-                    <p className="font-bold text-slate-800">{result.model}</p>
+                  <div className={`${softBg} rounded-lg p-5`}>
+                    <p className={`text-sm mb-2 ${bodyText}`}>Model Used</p>
+                    <p className={`font-bold ${titleText}`}>{result.model}</p>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-5">
-                    <p className="text-sm text-slate-500 mb-2">Confidence</p>
-                    <p className="font-bold text-slate-800">
+                  <div className={`${softBg} rounded-lg p-5`}>
+                    <p className={`text-sm mb-2 ${bodyText}`}>Confidence</p>
+                    <p className={`font-bold ${titleText}`}>
                       {result.confidence}%
                     </p>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-5">
-                    <p className="text-sm text-slate-500 mb-2">Duration</p>
-                    <p className="font-bold text-slate-800">
+                  <div className={`${softBg} rounded-lg p-5`}>
+                    <p className={`text-sm mb-2 ${bodyText}`}>Duration</p>
+                    <p className={`font-bold ${titleText}`}>
                       {result.duration}
                     </p>
                   </div>
@@ -617,7 +636,7 @@ ${result.explanation || "No hidden message detected."}`
           </div>
         </section>
 
-        <aside className="border-l border-slate-200 bg-white px-8 py-12 overflow-y-auto">
+        <aside className={`border-l ${border} ${pageBg} px-8 py-12 overflow-y-auto`}>
           <Documentation />
         </aside>
       </div>

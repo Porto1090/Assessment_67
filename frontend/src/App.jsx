@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 
-import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import History from "@/pages/History";
@@ -19,7 +18,7 @@ export default function AppRouter() {
       <Route element={<RootLayout />}>
         <Route
           path="/"
-          element={<Home />}
+          element={<Dashboard />}
         />
 
         <Route

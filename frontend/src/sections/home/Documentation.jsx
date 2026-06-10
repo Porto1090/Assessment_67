@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/translations/LanguageContext";
+import { useTheme } from "@/theme/ThemeContext";
 
 export default function Documentation() {
   const { t, language } = useLanguage();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const [active, setActive] = useState("home");
 
   const sections = [
@@ -70,26 +74,32 @@ export default function Documentation() {
   const current = docs[active];
 
   useEffect(() => {
-    console.log("Current documentation page:", active);
-  }, [active]);
-
-  useEffect(() => {
     setActive("home");
   }, [language]);
 
+  const pageBg = isDark ? "bg-slate-900" : "bg-white";
+  const cardBg = isDark ? "bg-slate-800" : "bg-white";
+  const softBg = isDark ? "bg-slate-900" : "bg-slate-50";
+  const titleText = isDark ? "text-white" : "text-slate-800";
+  const bodyText = isDark ? "text-slate-300" : "text-slate-500";
+  const mutedText = isDark ? "text-slate-400" : "text-slate-500";
+  const border = isDark ? "border-slate-700" : "border-slate-200";
+
   return (
-    <div className="flex h-full w-full flex-col bg-white">
+    <div className={`flex h-full w-full flex-col ${pageBg}`}>
       <header className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-800">
+        <h2 className={`text-3xl font-bold ${titleText}`}>
           {t.documentationTitle}
         </h2>
 
-        <p className="mt-4 text-base leading-7 text-slate-500">
+        <p className={`mt-4 text-base leading-7 ${bodyText}`}>
           {t.documentationSubtitle}
         </p>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+      <div
+        className={`min-h-0 flex-1 overflow-y-auto rounded-2xl border ${border} ${cardBg} p-8 shadow-sm`}
+      >
         {active === "home" && (
           <div className="space-y-8">
             {sections.map((section, sectionIndex) => (
@@ -97,11 +107,13 @@ export default function Documentation() {
                 key={section.title}
                 className={
                   sectionIndex !== 0
-                    ? "border-t border-slate-200 pt-8"
+                    ? `border-t ${border} pt-8`
                     : ""
                 }
               >
-                <h3 className="mb-5 text-sm font-bold uppercase tracking-wide text-slate-500">
+                <h3
+                  className={`mb-5 text-sm font-bold uppercase tracking-wide ${mutedText}`}
+                >
                   {section.title}
                 </h3>
 
@@ -111,13 +123,15 @@ export default function Documentation() {
                       key={item.id}
                       type="button"
                       onClick={() => setActive(item.id)}
-                      className="block w-full rounded-xl px-4 py-4 text-left transition hover:bg-blue-50"
+                      className={`block w-full rounded-xl px-4 py-4 text-left transition ${
+                        isDark ? "hover:bg-slate-700" : "hover:bg-blue-50"
+                      }`}
                     >
-                      <div className="text-lg font-bold text-blue-600">
+                      <div className="text-lg font-bold text-blue-500">
                         {item.name}
                       </div>
 
-                      <div className="mt-2 text-base leading-6 text-slate-500">
+                      <div className={`mt-2 text-base leading-6 ${bodyText}`}>
                         {item.description}
                       </div>
                     </button>
@@ -133,21 +147,29 @@ export default function Documentation() {
             <button
               type="button"
               onClick={() => setActive("home")}
-              className="mb-6 text-sm font-medium text-slate-500 transition hover:text-blue-600"
+              className={`mb-6 text-sm font-medium transition ${
+                isDark
+                  ? "text-slate-300 hover:text-blue-400"
+                  : "text-slate-500 hover:text-blue-600"
+              }`}
             >
               {t.backToDocumentation}
             </button>
 
-            <h3 className="text-2xl font-bold text-slate-800">
+            <h3 className={`text-2xl font-bold ${titleText}`}>
               {current.name}
             </h3>
 
-            <p className="mt-3 text-base leading-7 text-slate-500">
+            <p className={`mt-3 text-base leading-7 ${bodyText}`}>
               {current.description}
             </p>
 
-            <div className="mt-8 rounded-xl bg-slate-50 p-5">
-              <pre className="whitespace-pre-wrap font-mono text-sm leading-7 text-slate-600">
+            <div className={`mt-8 rounded-xl ${softBg} p-5`}>
+              <pre
+                className={`whitespace-pre-wrap font-mono text-sm leading-7 ${
+                  isDark ? "text-slate-300" : "text-slate-600"
+                }`}
+              >
                 {current.content}
               </pre>
             </div>
