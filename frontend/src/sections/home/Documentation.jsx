@@ -1,100 +1,123 @@
-import { useState, usEffect, useEffect } from 'react'
-const sections = [
-  {
-    title: 'Documentation sections:',
-    items: [
-      {
-        name: "What's new in Portronko 3.14?",
-        description: 'Recent language changes and updates.',
-      },
-      {
-        name: 'Tutorial',
-        description: "Start here: a tour of Portronko's syntax and features.",
-      },
-    ],
-  },
-  {
-    title: 'Indices, glossary, and search:',
-    items: [
-      {
-        name: 'Global index',
-        description: 'All functions, classes, and terms.',
-      },
-      {
-        name: 'Glossary',
-        description: 'Terms explained.',
-      },
-    ],
-  },
-  {
-    title: 'Project information:',
-    items: [
-      {
-        name: 'Reporting issues',
-        description: 'How to report issues and contribute to the project.',
-      },
-      {
-        name: 'Project public repository',
-        description: "Access the project's public repository.",
-      },
-    ],
-  },
-]
-
-const docs = sections.reduce((acc, section) => {
-  section.items.forEach((item) => {
-    acc[item.name] = item
-  })
-
-  return acc
-}, {})
+import { useEffect, useState } from "react";
+import { useLanguage } from "@/translations/LanguageContext";
 
 export default function Documentation() {
-  const [active, setActive] = useState('home')
+  const { t, language } = useLanguage();
+  const [active, setActive] = useState("home");
 
-  const current = docs[active]
-  const canGoBack = active !== 'home'
+  const sections = [
+    {
+      title: t.documentationSections,
+      items: [
+        {
+          id: "whatsNew",
+          name: t.whatsNew,
+          description: t.whatsNewDescription,
+          content: t.whatsNewContent,
+        },
+        {
+          id: "tutorial",
+          name: t.tutorial,
+          description: t.tutorialDescription,
+          content: t.tutorialContent,
+        },
+      ],
+    },
+    {
+      title: t.referenceGuide,
+      items: [
+        {
+          id: "globalIndex",
+          name: t.globalIndex,
+          description: t.globalIndexDescription,
+          content: t.globalIndexContent,
+        },
+        {
+          id: "glossary",
+          name: t.glossary,
+          description: t.glossaryDescription,
+          content: t.glossaryContent,
+        },
+      ],
+    },
+    {
+      title: t.projectInformation,
+      items: [
+        {
+          id: "reportingIssues",
+          name: t.reportingIssues,
+          description: t.reportingIssuesDescription,
+          content: t.reportingIssuesContent,
+        },
+        {
+          id: "projectRepository",
+          name: t.projectRepository,
+          description: t.projectRepositoryDescription,
+          content: t.projectRepositoryContent,
+        },
+      ],
+    },
+  ];
+
+  const docs = sections.reduce((acc, section) => {
+    section.items.forEach((item) => {
+      acc[item.id] = item;
+    });
+
+    return acc;
+  }, {});
+
+  const current = docs[active];
 
   useEffect(() => {
-    console.log('Current documentation page:', active)
-  }, [active])
+    console.log("Current documentation page:", active);
+  }, [active]);
 
-  // https://docs.python.org/3/
+  useEffect(() => {
+    setActive("home");
+  }, [language]);
 
   return (
-    <div className="flex h-full w-full flex-col bg-primary p-6">
-      <header className="mb-5">
-        <h2 className="text-2xl font-semibold text-white">
-          Portronko 3.14.5rc1 documentation
+    <div className="flex h-full w-full flex-col bg-white">
+      <header className="mb-8">
+        <h2 className="text-3xl font-bold text-slate-800">
+          {t.documentationTitle}
         </h2>
 
-        <p className="mt-2 text-sm leading-6 text-gray-400">
-          Welcome. This panel contains the official documentation reference and learning resources.
+        <p className="mt-4 text-base leading-7 text-slate-500">
+          {t.documentationSubtitle}
         </p>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-white/10 bg-black/10 p-5">
-        {active == "home" && 
+      <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        {active === "home" && (
           <div className="space-y-8">
-            {sections.map((section) => (
-              <section key={section.title}>
-                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">
+            {sections.map((section, sectionIndex) => (
+              <section
+                key={section.title}
+                className={
+                  sectionIndex !== 0
+                    ? "border-t border-slate-200 pt-8"
+                    : ""
+                }
+              >
+                <h3 className="mb-5 text-sm font-bold uppercase tracking-wide text-slate-500">
                   {section.title}
                 </h3>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {section.items.map((item) => (
                     <button
-                      key={item.name}
+                      key={item.id}
                       type="button"
-                      onClick={() => setActive(item.name)}
-                      className="block w-full rounded-xl border border-transparent px-3 py-3 text-left transition hover:border-white/10 hover:bg-white/5"
+                      onClick={() => setActive(item.id)}
+                      className="block w-full rounded-xl px-4 py-4 text-left transition hover:bg-blue-50"
                     >
-                      <div className="text-base font-medium text-blue-400">
+                      <div className="text-lg font-bold text-blue-600">
                         {item.name}
                       </div>
 
-                      <div className="mt-1 text-sm leading-6 text-gray-400">
+                      <div className="mt-2 text-base leading-6 text-slate-500">
                         {item.description}
                       </div>
                     </button>
@@ -103,25 +126,34 @@ export default function Documentation() {
               </section>
             ))}
           </div>
-        }
-        
-        {active !== "home" && (
+        )}
+
+        {active !== "home" && current && (
           <div>
             <button
               type="button"
-              onClick={() => setActive('home')}
-              className="mb-4 text-sm text-gray-400 transition hover:text-white"
+              onClick={() => setActive("home")}
+              className="mb-6 text-sm font-medium text-slate-500 transition hover:text-blue-600"
             >
-              &larr; Back to home
+              {t.backToDocumentation}
             </button>
 
-            <h3 className="text-lg font-medium text-white">{current.name}</h3>
-            <p className="mt-2 text-sm leading-6 text-gray-400">
-              {current.description || 'No description available.'}
+            <h3 className="text-2xl font-bold text-slate-800">
+              {current.name}
+            </h3>
+
+            <p className="mt-3 text-base leading-7 text-slate-500">
+              {current.description}
             </p>
+
+            <div className="mt-8 rounded-xl bg-slate-50 p-5">
+              <pre className="whitespace-pre-wrap font-mono text-sm leading-7 text-slate-600">
+                {current.content}
+              </pre>
+            </div>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
