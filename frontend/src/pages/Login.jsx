@@ -72,7 +72,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="userName" className="block mb-2 text-sm font-medium text-slate-800">
-                Username
+                Username/Email
               </label>
 
               <input
@@ -84,7 +84,7 @@ export default function Login() {
                 style={{
                   borderColor: errors.userName ? "#EF4444" : "#E2E8F0",
                 }}
-                placeholder="Enter your username"
+                placeholder="Enter your username or email"
               />
 
               {errors.userName && (

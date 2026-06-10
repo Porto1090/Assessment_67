@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useLanguage } from "@/translations/LanguageContext";
 import { useTheme } from "@/theme/ThemeContext";
 
-export default function RootLayout() {
+export default function RootLayout({ username, email }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,14 +24,8 @@ export default function RootLayout() {
   const { theme, toggleTheme } = useTheme();
 
   const isActive = (path) => {
-    if (path === "/dashboard" && location.pathname === "/dashboard") {
-      return true;
-    }
-
-    if (path !== "/dashboard" && location.pathname.includes(path)) {
-      return true;
-    }
-
+    if (path === "/dashboard" && location.pathname === "/dashboard") return true;
+    if (path !== "/dashboard" && location.pathname.includes(path)) return true;
     return false;
   };
 
@@ -41,26 +35,27 @@ export default function RootLayout() {
   };
 
   const navButtonClass = (path) =>
-    `flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition ${
+    `flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
       isActive(path)
-        ? "text-blue-500 bg-blue-50 dark:bg-blue-500/10"
-        : "text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+        ? "text-blue-600 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 font-semibold"
+        : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
     }`;
 
   const mobileNavButtonClass = (path) =>
-    `flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition ${
+    `flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-base transition-all ${
       isActive(path)
-        ? "text-blue-500 bg-blue-50 dark:bg-blue-500/10"
-        : "text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+        ? "text-blue-600 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 font-semibold"
+        : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
     }`;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
-      <nav className="border-b sticky top-0 z-50 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950 antialiased selection:bg-blue-500/10">
+      <nav className="border-b sticky top-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-slate-200 dark:border-slate-800/80">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
+            {/* LADO IZQUIERDO: Logo */}
             <div
-              className="flex items-center gap-3 cursor-pointer"
+              className="flex items-center gap-3 cursor-pointer group"
               onClick={() => handleNavigation("/dashboard")}
             >
               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500">
@@ -72,62 +67,50 @@ export default function RootLayout() {
               </span>
             </div>
 
-            <div className="hidden md:flex items-center gap-8">
-              <button
-                onClick={() => handleNavigation("/dashboard")}
-                className={navButtonClass("/dashboard")}
-              >
+            {/* CENTRO: Navegación Principal (Reducción de gaps para un aspecto compacto) */}
+            <div className="hidden md:flex items-center gap-3">
+              <button onClick={() => handleNavigation("/dashboard")} className={navButtonClass("/dashboard")}>
                 <Home className="w-4 h-4" />
-                {t.home}
+                {t.nav.home}
               </button>
-
-              <button
-                onClick={() => handleNavigation("/history")}
-                className={navButtonClass("/history")}
-              >
+              <button onClick={() => handleNavigation("/history")} className={navButtonClass("/history")}>
                 <History className="w-4 h-4" />
-                {t.history}
+                {t.nav.history}
               </button>
-
-              <button
-                onClick={() => handleNavigation("/help")}
-                className={navButtonClass("/help")}
-              >
+              <button onClick={() => handleNavigation("/help")} className={navButtonClass("/help")}>
                 <HelpCircle className="w-4 h-4" />
-                {t.help}
+                {t.nav.help}
               </button>
             </div>
 
+            {/* LADO DERECHO: Acciones / Configuración */}
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={toggleLanguage}
                 className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 hover:text-blue-600 transition"
               >
-                <Languages className="w-4 h-4" />
+                <Languages className="w-3.5 h-3.5 text-slate-400" />
                 {language === "en" ? "EN" : "ES"}
               </button>
 
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 hover:text-blue-600 transition"
+                className="min-w-16 hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 hover:text-blue-600 transition"
               >
-                {theme === "light" ? (
-                <Sun className="w-4 h-4" />
-                ) : (
-                <Moon className="w-4 h-4" />
-                )}
-                {theme === "light" ? "Light" : "Dark"}
+                {theme === "light" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                {theme === "light" ? t.nav.lightmode : t.nav.darkmode}
               </button>
 
-              <div className="hidden sm:flex items-center gap-3">
+              {/* Perfil del Usuario */}
+              <div className="hidden sm:flex items-center gap-3 ml-4">
                 <div className="hidden lg:block text-right">
                   <p className="text-sm font-medium text-slate-800 dark:text-white">
-                    Demo User
+                    {username}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    demo@ciphervision.ai
+                    {email}
                   </p>
                 </div>
 
@@ -136,6 +119,7 @@ export default function RootLayout() {
                 </div>
               </div>
 
+              {/* Gatillo Menú Móvil */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
@@ -149,6 +133,7 @@ export default function RootLayout() {
             </div>
           </div>
 
+          {/* MENÚ MÓVIL (Estructura interna estilizada) */}
           {mobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-slate-200 dark:border-slate-800">
               <div className="flex flex-col gap-2">
@@ -157,7 +142,7 @@ export default function RootLayout() {
                   className={mobileNavButtonClass("/dashboard")}
                 >
                   <Home className="w-5 h-5" />
-                  {t.home}
+                  {t.nav.home}
                 </button>
 
                 <button
@@ -165,7 +150,7 @@ export default function RootLayout() {
                   className={mobileNavButtonClass("/history")}
                 >
                   <History className="w-5 h-5" />
-                  {t.history}
+                  {t.nav.history}
                 </button>
 
                 <button
@@ -173,7 +158,7 @@ export default function RootLayout() {
                   className={mobileNavButtonClass("/help")}
                 >
                   <HelpCircle className="w-5 h-5" />
-                  {t.help}
+                  {t.nav.help}
                 </button>
 
                 <button
@@ -195,10 +180,11 @@ export default function RootLayout() {
                  ) : (
                  <Moon className="w-5 h-5" />
                  )}
-                 {theme === "light" ? "Light" : "Dark"}
+                 {theme === "light" ? t.nav.lightmode : t.nav.darkmode}
                 </button>
 
-                <div className="sm:hidden mt-4 pt-4 border-t px-4 border-slate-200 dark:border-slate-800">
+                {/* Perfil en móvil unificado sin saltos extraños */}
+                <div className="sm:hidden mt-4 ml-4 pt-4 border-t px-4 border-slate-200 dark:border-slate-800">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-500">
                       <User className="w-5 h-5 text-white" />
@@ -206,10 +192,10 @@ export default function RootLayout() {
 
                     <div>
                       <p className="text-sm font-medium text-slate-800 dark:text-white">
-                        Demo User
+                        {username}
                       </p>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        demo@ciphervision.ai
+                        {email}
                       </p>
                     </div>
                   </div>

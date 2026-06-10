@@ -9,57 +9,10 @@ import { useLanguage } from "@/translations/LanguageContext";
 import { useTheme } from "@/theme/ThemeContext";
 
 export default function History() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { theme } = useTheme();
 
   const isDark = theme === "dark";
-
-  const t = {
-    en: {
-      title: "Analysis History",
-      subtitle: "View all your previous image and code analysis results",
-      searchPlaceholder: "Search by file name...",
-      allStatus: "All Status",
-      detected: "Detected",
-      notDetected: "Not Detected",
-      allModels: "All Models",
-      noHistory: "No Analysis History",
-      noResults: "No Results Found",
-      emptyHistory: "Start analyzing images or code to see your history here",
-      emptyResults: "Try adjusting your filters or search query",
-      date: "DATE",
-      image: "IMAGE",
-      model: "MODEL",
-      status: "STATUS",
-      confidence: "CONFIDENCE",
-      showing: "Showing",
-      of: "of",
-      results: "results",
-    },
-
-    es: {
-      title: "Historial de Análisis",
-      subtitle: "Consulta todos tus análisis anteriores de imágenes y código",
-      searchPlaceholder: "Buscar por nombre de archivo...",
-      allStatus: "Todos los estados",
-      detected: "Detectado",
-      notDetected: "No Detectado",
-      allModels: "Todos los modelos",
-      noHistory: "No hay historial de análisis",
-      noResults: "No se encontraron resultados",
-      emptyHistory:
-        "Comienza analizando imágenes o código para ver tu historial aquí",
-      emptyResults: "Intenta ajustar tus filtros o búsqueda",
-      date: "FECHA",
-      image: "IMAGEN",
-      model: "MODELO",
-      status: "ESTADO",
-      confidence: "CONFIANZA",
-      showing: "Mostrando",
-      of: "de",
-      results: "resultados",
-    },
-  }[language];
 
   const [history, setHistory] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -122,11 +75,11 @@ export default function History() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className={`mb-2 text-4xl font-bold ${titleText}`}>
-            {t.title}
+            {t.history.title}
           </h1>
 
           <p className={`text-base ${bodyText}`}>
-            {t.subtitle}
+            {t.history.subtitle}
           </p>
         </div>
 
@@ -150,7 +103,7 @@ export default function History() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t.searchPlaceholder}
+                  placeholder={t.history.searchPlaceholder}
                   className={`w-full pl-10 pr-4 py-3 rounded-lg border outline-none placeholder:text-slate-400 ${
                     isDark
                       ? "border-slate-700 bg-slate-900 text-white"
@@ -166,9 +119,9 @@ export default function History() {
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className={inputClass}
               >
-                <option value="all">{t.allStatus}</option>
-                <option value="detected">{t.detected}</option>
-                <option value="not-detected">{t.notDetected}</option>
+                <option value="all">{t.history.allStatus}</option>
+                <option value="detected">{t.history.detected}</option>
+                <option value="not-detected">{t.history.notDetected}</option>
               </select>
             </div>
 
@@ -178,7 +131,7 @@ export default function History() {
                 onChange={(e) => setFilterModel(e.target.value)}
                 className={inputClass}
               >
-                <option value="all">{t.allModels}</option>
+                <option value="all">{t.history.allModels}</option>
                 <option value="CNN">CNN</option>
                 <option value="SVM">SVM</option>
                 <option value="Code Analyzer">Code Analyzer</option>
@@ -210,11 +163,11 @@ export default function History() {
             </div>
 
             <h3 className={`mb-2 text-xl font-semibold ${titleText}`}>
-              {history.length === 0 ? t.noHistory : t.noResults}
+              {history.length === 0 ? t.history.noHistory : t.history.noResults}
             </h3>
 
             <p className={`text-sm ${bodyText}`}>
-              {history.length === 0 ? t.emptyHistory : t.emptyResults}
+              {history.length === 0 ? t.history.emptyHistory : t.history.emptyResults}
             </p>
           </div>
         ) : (
@@ -229,19 +182,19 @@ export default function History() {
               <thead className={softBg}>
                 <tr>
                   <th className={`px-6 py-4 text-left ${headerText}`}>
-                    {t.date}
+                    {t.history.date}
                   </th>
                   <th className={`px-6 py-4 text-left ${headerText}`}>
-                    {t.image}
+                    {t.history.image}
                   </th>
                   <th className={`px-6 py-4 text-left ${headerText}`}>
-                    {t.model}
+                    {t.history.model}
                   </th>
                   <th className={`px-6 py-4 text-left ${headerText}`}>
-                    {t.status}
+                    {t.history.status}
                   </th>
                   <th className={`px-6 py-4 text-left ${headerText}`}>
-                    {t.confidence}
+                    {t.history.confidence}
                   </th>
                 </tr>
               </thead>
@@ -268,12 +221,12 @@ export default function History() {
                       {item.detected ? (
                         <div className="flex items-center gap-2 text-green-600">
                           <CheckCircle2 className="w-4 h-4" />
-                          {t.detected}
+                          {t.history.detected}
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 text-red-600">
                           <XCircle className="w-4 h-4" />
-                          {t.notDetected}
+                          {t.history.notDetected}
                         </div>
                       )}
                     </td>
@@ -291,8 +244,8 @@ export default function History() {
         {filteredHistory.length > 0 && (
           <div className="mt-6">
             <p className={`text-sm ${bodyText}`}>
-              {t.showing} {filteredHistory.length} {t.of}{" "}
-              {history.length} {t.results}
+              {t.history.showing} {filteredHistory.length} {t.history.of}{" "}
+              {history.length} {t.history.results}
             </p>
           </div>
         )}
