@@ -1,8 +1,13 @@
 # BACKEND
 
-## Run the backend
-```
-python -m app.main
+## Install depen
+
+```sh
+pip install -r requirements.txt
 ```
 
-TENEMOS CI/CD
+## Run App
+
+```sh
+cd .\app\
+uvicorn main:app --reload
