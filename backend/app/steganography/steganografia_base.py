@@ -10,6 +10,9 @@ class SteganografiaBase(ABC):
 	preparación de imagen y stream de datos.
 	"""
 
+	# Tamaño al que se redimensionan todas las imágenes.
+	SIZE = (256, 256)
+
 	# =====================================
 	# TEXTO -> BITS
 	# =====================================
@@ -34,35 +37,28 @@ class SteganografiaBase(ABC):
 
 	# =====================================
 	# PREPARAR IMAGEN
-	# Acepta destino explícito para que procesar_dataset
-	# no necesite su propia copia de esta lógica.
 	# =====================================
 
-	def preparar_imagen(self, ruta, multiplo=8, destino=None):
+	def preparar_imagen(self, ruta, destino=None):
 		"""
-		Abre cualquier formato, recorta al múltiplo indicado y guarda
-		como PNG. Si no se indica destino usa 'imagen_preparada.png'.
-		Devuelve la ruta del archivo resultante.
+		Abre cualquier formato, redimensiona a SIZE y devuelve
+		un array BGR listo para OpenCV.
+		Si se indica destino guarda también una copia PNG en esa ruta.
 		"""
 		img = Image.open(ruta).convert("RGB")
-		w, h = img.size
-		w = (w // multiplo) * multiplo
-		h = (h // multiplo) * multiplo
-		img = img.resize((w, h), Image.LANCZOS)
-		ruta_png = destino or "imagen_preparada.png"
-		img.save(ruta_png, "PNG")
-		return ruta_png
+		img = img.resize(self.SIZE, Image.LANCZOS)
+		if destino:
+			img.save(destino, "PNG")
+		return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
 	# =====================================
 	# CANAL AZUL
 	# =====================================
 
-	def leer_canal_azul(self, ruta, flotante=False):
-		img = cv2.imread(ruta, cv2.IMREAD_COLOR)
-		blue = img[:, :, 0]
-		if flotante:
-			blue = blue.astype(np.float32)
-		return img, blue
+	def leer_canal_azul(self, origen, flotante=False):
+		img = origen if isinstance(origen, np.ndarray) else cv2.imread(origen, cv2.IMREAD_COLOR)
+		blue = img[:, :, 0].astype(np.float32) if flotante else img[:, :, 0]
+		return img.copy(), blue
 
 	def guardar_canal_azul(self, img, blue, ruta_salida):
 		img[:, :, 0] = blue
@@ -92,7 +88,6 @@ class SteganografiaBase(ABC):
 	def decode(self, imagen_estego, **kwargs):
 		"""Recupera y devuelve el mensaje oculto en imagen_estego."""
 
-
 	# =====================================
 	# PAYLOAD — relleno de capacidad
 	# =====================================
@@ -103,7 +98,6 @@ class SteganografiaBase(ABC):
 		"""
 		Repite el mensaje separado por SEPARADOR hasta ocupar
 		casi toda la capacidad disponible.
-		Devuelve el payload completo listo para ocultar.
 		"""
 		unidad          = mensaje + self.SEPARADOR
 		bits_por_unidad = len(self.texto_a_bits(unidad))
@@ -118,6 +112,7 @@ class SteganografiaBase(ABC):
 	def extraer_payload(payload):
 		"""
 		Extrae el mensaje original de un payload rellenado.
+		"porto%porto%porto%" → "porto"
 		"""
 		partes = [p for p in payload.split("%") if p]
 		return partes[0] if partes else payload

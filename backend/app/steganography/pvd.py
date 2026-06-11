@@ -78,8 +78,7 @@ class PVD(SteganografiaBase):
 	# =====================================
 
 	def encode(self, imagen_original, imagen_salida, mensaje, **kwargs):
-		ruta = self.preparar_imagen(imagen_original, multiplo=2)
-		img, blue = self.leer_canal_azul(ruta)
+		img, blue = self.leer_canal_azul(self.preparar_imagen(imagen_original))
 		stream = self.crear_stream_simple(mensaje)
 		h, w = blue.shape
 		pares = self._generar_pares(w, h)
@@ -139,8 +138,7 @@ class PVD(SteganografiaBase):
 
 	def calcular_capacidad(self, imagen):
 		"""Capacidad PVD: suma de bits disponibles por cada par de píxeles."""
-		ruta = self.preparar_imagen(imagen, multiplo=2)
-		_, blue = self.leer_canal_azul(ruta)
+		_, blue = self.leer_canal_azul(self.preparar_imagen(imagen))
 		h, w = blue.shape
 		pares = self._generar_pares(w, h)
 		capacidad = sum(

@@ -10,11 +10,9 @@ class BPCS(SteganografiaBase):
 
     Orden de escritura: todos los bloques 8×8 de los planos 2 y 3
     en orden raster fijo (plano 2 completo, luego plano 3 completo).
-    No depende del contenido de la imagen original — el decode solo
-    necesita la imagen esteganografiada.
 
     La conjugación garantiza que todos los bloques escritos tengan
-    alta complejidad visual (≥ 0.70), manteniendo la esencia de BPCS.
+    alta complejidad visual (≥ 0.70).
     """
 
     UMBRAL_DEFAULT = 0.30
@@ -72,8 +70,6 @@ class BPCS(SteganografiaBase):
     # =====================================
     # POSICIONES — orden raster fijo
     # Determinista dado solo el tamaño de la imagen.
-    # No depende del contenido → encode y decode coinciden
-    # sin necesitar la imagen original.
     # =====================================
 
     @staticmethod
@@ -165,8 +161,7 @@ class BPCS(SteganografiaBase):
         Overhead del stream: 96 bits fijos + 1 bit de mapa por bloque.
         N_bloques_datos = (M*64 - 96) // 65
         """
-        ruta = self.preparar_imagen(imagen)
-        img, blue = self.leer_canal_azul(ruta)
+        img, blue = self.leer_canal_azul(self.preparar_imagen(imagen))
         h, w = blue.shape
         M = len(self._obtener_posiciones(h, w, self.PLANOS))
         N_bloques = (M * 64 - 96) // 65
@@ -177,8 +172,7 @@ class BPCS(SteganografiaBase):
     # =====================================
 
     def encode(self, imagen_original, imagen_salida, mensaje, **kwargs):
-        ruta = self.preparar_imagen(imagen_original)
-        img, blue = self.leer_canal_azul(ruta)
+        img, blue = self.leer_canal_azul(self.preparar_imagen(imagen_original))
         gray = self._binary_to_gray(blue)
         h, w = blue.shape
 
@@ -215,8 +209,6 @@ class BPCS(SteganografiaBase):
 
     # =====================================
     # DECODE
-    # No necesita la imagen original — el orden de lectura es
-    # el mismo orden raster fijo usado en el encode.
     # =====================================
 
     def decode(self, imagen_estego, **kwargs):

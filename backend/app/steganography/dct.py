@@ -21,8 +21,7 @@ class DCT(SteganografiaBase):
 	# =====================================
 
 	def encode(self, imagen_original, imagen_salida, mensaje, **kwargs):
-		ruta = self.preparar_imagen(imagen_original)
-		img, blue = self.leer_canal_azul(ruta, flotante=True)
+		img, blue = self.leer_canal_azul(self.preparar_imagen(imagen_original), flotante=True)
 		bits = self.texto_a_bits(mensaje) + self.DELIMITADOR
 
 		h, w = blue.shape
@@ -95,7 +94,6 @@ class DCT(SteganografiaBase):
 
 	def calcular_capacidad(self, imagen):
 		"""Capacidad DCT: un bit por bloque 8×8."""
-		ruta = self.preparar_imagen(imagen)
-		_, blue = self.leer_canal_azul(ruta)
+		_, blue = self.leer_canal_azul(self.preparar_imagen(imagen))
 		h, w = blue.shape
 		return (h // 8) * (w // 8) - len(self.DELIMITADOR)
