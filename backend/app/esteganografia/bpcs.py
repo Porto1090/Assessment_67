@@ -7,13 +7,24 @@ class BPCS(SteganografiaBase):
     """
     Esteganografía BPCS (Bit-Plane Complexity Segmentation).
 
-    NOTA: el decode requiere la imagen original porque escribir el
-    stream puede reducir la complejidad de algunos bloques, haciendo
-    que las posiciones calculadas desde la esteganografiada difieran
-    de las usadas en el encode.
+    Oculta datos en los planos de bit 2 y 3 del canal azul usando
+    codificación Gray y conjugación de bloques.
+
+    Orden de escritura: todos los bloques 8×8 de los planos 2 y 3
+    en orden raster fijo (plano 2 completo, luego plano 3 completo).
+    No depende del contenido de la imagen original — el decode solo
+    necesita la imagen esteganografiada.
+
+    La conjugación garantiza que todos los bloques escritos tengan
+    alta complejidad visual (≥ 0.70).
     """
 
     UMBRAL_DEFAULT = 0.30
+    PLANOS         = (2, 3)
+
+    # =====================================
+    # GRAY
+    # =====================================
 
     @staticmethod
     def _binary_to_gray(img):
@@ -26,6 +37,10 @@ class BPCS(SteganografiaBase):
         result ^= (result >> 2)
         result ^= (result >> 4)
         return result
+
+    # =====================================
+    # COMPLEJIDAD
+    # =====================================
 
     @staticmethod
     def _complejidad_bloque(bloque):
@@ -40,6 +55,10 @@ class BPCS(SteganografiaBase):
                     transiciones += 1
         return transiciones / 112
 
+    # =====================================
+    # CONJUGACIÓN
+    # =====================================
+
     @staticmethod
     def _patron_conjugacion():
         patron = np.zeros((8, 8), dtype=np.uint8)
@@ -51,6 +70,29 @@ class BPCS(SteganografiaBase):
     @classmethod
     def _conjugar_bloque(cls, bloque):
         return np.bitwise_xor(bloque, cls._patron_conjugacion())
+
+    # =====================================
+    # POSICIONES — orden raster fijo
+    # Determinista dado solo el tamaño de la imagen.
+    # =====================================
+
+    @staticmethod
+    def _obtener_posiciones(h, w, planos=(2, 3)):
+        """
+        Devuelve todos los bloques 8×8 de los planos indicados
+        en orden raster (fila a fila, izquierda a derecha),
+        plano 2 completo primero, luego plano 3.
+        """
+        posiciones = []
+        for plano in planos:
+            for y in range(0, h, 8):
+                for x in range(0, w, 8):
+                    posiciones.append((plano, y, x))
+        return posiciones
+
+    # =====================================
+    # MENSAJE -> BLOQUES + MAPA
+    # =====================================
 
     def _crear_bloques_mensaje(self, mensaje, alpha=None):
         alpha = alpha or self.UMBRAL_DEFAULT
@@ -71,12 +113,18 @@ class BPCS(SteganografiaBase):
             indice += 64
         return bloques, mapa, longitud_original
 
+    # =====================================
+    # STREAM
+    # =====================================
+
     def _crear_stream_bpcs(self, bloques, mapa, longitud):
         longitud_msg = format(longitud,     '032b')
         cantidad     = format(len(bloques), '032b')
         mapa_bits    = ''.join(str(x) for x in mapa)
-        datos_bits   = ''.join(str(int(x)) for bloque in bloques for x in bloque.flatten())
-        contenido    = longitud_msg + cantidad + mapa_bits + datos_bits
+        datos_bits   = ''.join(
+            str(int(x)) for bloque in bloques for x in bloque.flatten()
+        )
+        contenido = longitud_msg + cantidad + mapa_bits + datos_bits
         return format(len(contenido), '032b') + contenido
 
     @staticmethod
@@ -106,32 +154,21 @@ class BPCS(SteganografiaBase):
             bits += ''.join(str(int(x)) for x in bloque.flatten())
         return self.bits_a_texto(bits[:longitud])
 
-    def _obtener_posiciones_validas(self, imagen, umbral=None, planos=(2, 3)):
-        umbral = umbral or self.UMBRAL_DEFAULT
-        ruta   = self.preparar_imagen(imagen)
-        img, blue = self.leer_canal_azul(ruta)
-        gray   = self._binary_to_gray(blue)
-        posiciones = []
-        for plano in planos:
-            bitplane = (gray >> plano) & 1
-            h, w = bitplane.shape
-            for y in range(0, h, 8):
-                for x in range(0, w, 8):
-                    bloque = bitplane[y:y+8, x:x+8]
-                    if bloque.shape != (8, 8):
-                        continue
-                    if self._complejidad_bloque(bloque) > umbral:
-                        posiciones.append((plano, y, x))
-        return posiciones
+    # =====================================
+    # CAPACIDAD
+    # =====================================
 
     def calcular_capacidad(self, imagen):
         """
         Capacidad neta en bits de mensaje disponibles.
-        Descuenta el overhead del stream (64 bits de header + 1 bit de mapa por bloque).
-        stream_total = 32 + 32 + 32 + N_bloques + N_bloques*64 = 96 + N_bloques*65
-        Despejando: N_bloques = (M*64 - 96) // 65
+        M = total de bloques 8×8 en los planos usados.
+        Overhead del stream: 96 bits fijos + 1 bit de mapa por bloque.
+        N_bloques_datos = (M*64 - 96) // 65
         """
-        M = len(self._obtener_posiciones_validas(imagen))
+        ruta = self.preparar_imagen(imagen)
+        img, blue = self.leer_canal_azul(ruta)
+        h, w = blue.shape
+        M = len(self._obtener_posiciones(h, w, self.PLANOS))
         N_bloques = (M * 64 - 96) // 65
         return N_bloques * 64
 
@@ -143,10 +180,14 @@ class BPCS(SteganografiaBase):
         ruta = self.preparar_imagen(imagen_original)
         img, blue = self.leer_canal_azul(ruta)
         gray = self._binary_to_gray(blue)
+        h, w = blue.shape
 
         bloques, mapa, longitud = self._crear_bloques_mensaje(mensaje)
         stream     = self._crear_stream_bpcs(bloques, mapa, longitud)
-        posiciones = self._obtener_posiciones_validas(imagen_original)
+        posiciones = self._obtener_posiciones(h, w, self.PLANOS)
+
+        if len(stream) > len(posiciones) * 64:
+            raise ValueError("Mensaje demasiado grande para esta imagen.")
 
         indice = bloques_usados = 0
         for plano, y, x in posiciones:
@@ -174,20 +215,14 @@ class BPCS(SteganografiaBase):
 
     # =====================================
     # DECODE
-    # Requiere la imagen original para calcular las mismas
-    # posiciones que se usaron en el encode.
     # =====================================
 
-    def decode(self, imagen_estego, imagen_original=None, **kwargs):
-        if not imagen_original:
-            raise ValueError(
-                "BPCS necesita la imagen original para decodear.\n"
-                "Usa: decode(imagen_estego, imagen_original='ruta/original.png')"
-            )
-
+    def decode(self, imagen_estego, **kwargs):
         img, blue = self.leer_canal_azul(imagen_estego)
         gray = self._binary_to_gray(blue)
-        posiciones = self._obtener_posiciones_validas(imagen_original)
+        h, w = blue.shape
+
+        posiciones = self._obtener_posiciones(h, w, self.PLANOS)
 
         bits  = ""
         total = None
