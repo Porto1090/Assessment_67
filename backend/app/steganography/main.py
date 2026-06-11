@@ -1,6 +1,4 @@
 """
-main.py
--------
 Punto de entrada único para todas las operaciones de esteganografía.
 
 COMANDOS:
@@ -27,21 +25,18 @@ import os
 import sys
 import argparse
 
-from BPCS import BPCS
-from DCT  import DCT
-from PVD import PVD
-from LSB import LSB
+from bpcs import BPCS
+from dct  import DCT
+from pvd import PVD
+from lsb import LSB
 
 # =====================================
 # CONSTANTES
 # =====================================
 
 ALGORITMOS = {"bpcs": BPCS, "dct": DCT, "pvd": PVD, "lsb": LSB}
-
 FORMATOS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff", ".tif", ".gif"}
-
 MENSAJE_DEFAULT = "Mensaje de prueba dataset"
-
 
 # =====================================
 # DATASET
@@ -66,11 +61,11 @@ def cmd_dataset(args):
 	print(f"\nImágenes encontradas: {len(imagenes)}")
 
 	carpetas = {
-		"originales":  os.path.join(carpeta_salida, "originales"),
-		"estego_bpcs": os.path.join(carpeta_salida, "estego_bpcs"),
-		"estego_dct":  os.path.join(carpeta_salida, "estego_dct"),
-		"estego_pvd":  os.path.join(carpeta_salida, "estego_pvd"),
-		"estego_lsb":  os.path.join(carpeta_salida, "estego_lsb"),
+		"originales":  os.path.join(carpeta_salida, "original"),
+		"estego_bpcs": os.path.join(carpeta_salida, "bpcs"),
+		"estego_dct":  os.path.join(carpeta_salida, "dct"),
+		"estego_pvd":  os.path.join(carpeta_salida, "pvd"),
+		"estego_lsb":  os.path.join(carpeta_salida, "lsb"),
 	}
 
 	for c in carpetas.values():
@@ -84,13 +79,18 @@ def cmd_dataset(args):
 	errores = []
 
 	for i, nombre in enumerate(imagenes, 1):
-		nombre_base    = f"img_{i:02d}.png"
+		nombre_og     = f"img_{i:02d}_og.png"
+		nombre_bpcs   = f"img_{i:02d}_bpcs.png"
+		nombre_dct    = f"img_{i:02d}_dct.png"
+		nombre_pvd    = f"img_{i:02d}_pvd.png"
+		nombre_lsb    = f"img_{i:02d}_lsb.png"
+
 		ruta_original  = os.path.join(carpeta_entrada,         nombre)
-		ruta_preparada = os.path.join(carpetas["originales"],  nombre_base)
-		ruta_bpcs      = os.path.join(carpetas["estego_bpcs"], nombre_base)
-		ruta_dct       = os.path.join(carpetas["estego_dct"],  nombre_base)
-		ruta_pvd       = os.path.join(carpetas["estego_pvd"],  nombre_base)
-		ruta_lsb       = os.path.join(carpetas["estego_lsb"],  nombre_base)
+		ruta_preparada = os.path.join(carpetas["originales"],  nombre_og)
+		ruta_bpcs      = os.path.join(carpetas["estego_bpcs"], nombre_bpcs)
+		ruta_dct       = os.path.join(carpetas["estego_dct"],  nombre_dct)
+		ruta_pvd       = os.path.join(carpetas["estego_pvd"],  nombre_pvd)
+		ruta_lsb       = os.path.join(carpetas["estego_lsb"],  nombre_lsb)
 
 		print(f"\n[{i}/{len(imagenes)}] {nombre}")
 

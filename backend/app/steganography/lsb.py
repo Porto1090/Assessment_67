@@ -1,8 +1,5 @@
-# lsb.py
-
 import numpy as np
 from steganografia_base import SteganografiaBase
-
 
 class LSB(SteganografiaBase):
 	"""

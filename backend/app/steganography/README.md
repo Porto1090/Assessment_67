@@ -1,4 +1,6 @@
-# Investigación de Algoritmos de Esteganografía
+# STEGANOGRAPHY
+
+## Investigación de Algoritmos de Esteganografía
 
 ## Objetivo
 
@@ -93,37 +95,48 @@ Los tres algoritmos heredan de `SteganografiaBase`, que provee:
 
 ## Uso
 
-### Procesar dataset completo
+### To process a full directory (All decoders)
 
-```bash
-python main.py dataset --carpeta imagenes/
-python main.py dataset --carpeta imagenes/ --mensaje "mensaje" --salida output/
+```sh
+python main.py dataset --carpeta {INPUT_ROUTE} --salida {OUTPUT_ROUTE} --mensaje {MESSAGE}
 ```
 
-Genera cuatro carpetas en `output/`: `originales/`, `estego_bpcs/`, `estego_dct/`, `estego_pvd/`.
+#### Examples
 
-### Encodear una imagen
+```sh
+python main.py dataset --carpeta images/
 
-```bash
-python main.py encode --imagen foto.png --algoritmo bpcs --mensaje "mensaje"
-python main.py encode --imagen foto.png --algoritmo dct  --mensaje "mensaje"
-python main.py encode --imagen foto.png --algoritmo pvd  --mensaje "mensaje"
+python main.py dataset --carpeta images/ --salida results/ --mensaje "Hello World!"
 ```
 
-### Decodear una imagen
+### To Ecode only one image
 
-```bash
-python main.py decode --imagen foto_estego_dct.png --algoritmo dct
-python main.py decode --imagen foto_estego_pvd.png --algoritmo pvd
-python main.py decode --imagen foto_estego_bpcs.png --algoritmo bpcs --original foto.png
+```sh
+python main.py encode --imagen {INPUT_ROUTE/FILE_NAME} --algoritmo {ALGORITHM_NAME} --mensaje {MESSAGE} --salida {OUTPUT_ROUTE/OUTPUT_FILE_NAME}
 ```
 
----
+#### Examples
 
-## Capacidad por algoritmo (imagen 256×256 de referencia)
+```sh
+python main.py encode --imagen image1.png --algoritmo lsb --mensaje "Hello World!"
 
-| Algoritmo | Capacidad     | Repeticiones del mensaje |
-|-----------|---------------|--------------------------|
-| BPCS      | ~128,960 bits | ~2,686x                  |
-| PVD       | ~68,390 bits  | ~1,424x                  |
-| DCT       | ~992 bits     | ~20x                     |
+python main.py encode --imagen images/image1.png --algoritmo lsb --mensaje "Hello World!"
+
+python main.py encode --imagen image1.png --algoritmo dct --mensaje "Hello World!" --salida dct_image1.png
+
+python main.py encode --imagen images/image1.png --algoritmo dct --mensaje "Hello World!" --salida results/dct_image1.png
+```
+
+### To Decode only one image
+
+```sh
+python main.py decode --imagen {INPUT_ROUTE/FILE_NAME} --algoritmo {ALGORITHM_NAME}
+```
+
+#### Examples
+
+```sh
+python main.py decode --imagen image1_lsb.png --algoritmo lsb
+
+python main.py decode --imagen results/image1_lsb.png --algoritmo lsb
+```
