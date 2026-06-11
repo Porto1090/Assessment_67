@@ -1,6 +1,13 @@
 # BACKEND
 
-## Run the backend
+## Install depen
+
+```sh
+pip install -r requirements.txt
 ```
-python -m app.main
-```
+
+## Run App
+
+```sh
+cd .\app\
+uvicorn main:app --reload

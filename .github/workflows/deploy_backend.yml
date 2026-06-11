@@ -1,0 +1,37 @@
+name: Deploy Backend a VM Privada
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'backend/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, backend-vm]
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Descargar el código más reciente
+        uses: actions/checkout@v3
+
+      - name: Mover archivos a la carpeta del backend
+        run: |
+          cp -r * /var/www/backend/
+
+      - name: Instalar dependencias de Python
+        run: |
+          /var/www/backend/venv/bin/pip install -r /var/www/backend/requirements.txt
+
+      - name: Reiniciar el servicio de FastAPI
+        run: |
+          sudo systemctl restart backend67
