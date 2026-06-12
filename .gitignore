@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+dataset/
+raw_dataset/
 __pycache__
 venv
 .venv

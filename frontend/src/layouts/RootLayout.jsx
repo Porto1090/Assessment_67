@@ -119,7 +119,6 @@ export default function RootLayout({username, email}) {
                   <p className="text-sm font-medium text-slate-800 dark:text-white">
                     {username}
                   </p>
-
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     {email}
                   </p>
