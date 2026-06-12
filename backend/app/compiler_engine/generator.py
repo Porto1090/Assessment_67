@@ -50,7 +50,7 @@ class CodeGenerator:
           # Enviamos la imagen a la API de Inferencia para que nos diga qué algoritmo de esteganografía se usó
           with open(image_path, "rb") as file_to_predict:
             response = requests.post(
-              f"{INFERENCE_API_URL}/api/predict", 
+              f"{INFERENCE_API_URL}/api/model", 
               files={"image": file_to_predict}
             )
               

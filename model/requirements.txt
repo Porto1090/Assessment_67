@@ -1,0 +1,12 @@
+# ── CORE DE DEEP LEARNING Y PROCESAMIENTO ─────────────────────────────────────
+torch>=2.0.0
+torchvision
+numpy>=1.22.0
+scipy>=1.8.0
+pillow>=9.0.0
+
+# ── API / SERVIDOR WEB (FASTAPI) ──────────────────────────────────────────────
+fastapi>=0.100.0
+uvicorn[standard]>=0.22.0
+python-multipart>=0.0.6
+pydantic>=2.0.0

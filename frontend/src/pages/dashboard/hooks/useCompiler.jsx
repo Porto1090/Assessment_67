@@ -41,9 +41,9 @@ export function useCompiler() {
       }
 
       // Reemplaza esta URL con la de tu endpoint real de FastAPI
-      const response = await fetch("{API_BASE_URL}/compile", {
+      const response = await fetch(`${API_BASE_URL}/compiler/compile`, {
         method: "POST",
-        body: formData, // fetch configura automáticamente el 'multipart/form-data'
+        body: formData,
       });
 
       const data = await response.json();
