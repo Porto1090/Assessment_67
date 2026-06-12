@@ -3,7 +3,7 @@
 # Using FastAPI to create a simple authentication API with MongoDB as the database
 
 from fastapi import FastAPI
-from app.routers import users, compiler, history
+from app.routers import users, compiler, history, stego
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,6 +22,7 @@ app.add_middleware(
 app.include_router(users.router)
 app.include_router(history.router)
 app.include_router(compiler.router)
+app.include_router(stego.router)
 
 @app.get("/")
 async def root():

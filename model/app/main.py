@@ -153,7 +153,7 @@ async def root():
 def health():
   return {"status": "ok", "device": str(device), "model_loaded": model is not None}
 
-@app.post("/model")
+@app.post("/api/model")
 async def predict(id: str = Form(...), file: UploadFile = File(...)):
   if model is None:
     return {
