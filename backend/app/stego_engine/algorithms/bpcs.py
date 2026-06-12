@@ -1,5 +1,5 @@
 import numpy as np
-from steganografia_base import SteganografiaBase
+from app.stego_engine.algorithms.steganografia_base import SteganografiaBase
 
 class BPCS(SteganografiaBase):
     """
