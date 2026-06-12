@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 
-const BASE_URL = "http://172.16.67.177:4321/users";
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,7 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${BASE_URL}/register`, {
+      const response = await fetch(`${API_BASE_URL}/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
@@ -36,7 +36,7 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${BASE_URL}/login`, {
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ username, password }),
@@ -45,7 +45,7 @@ export function useAuth() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Login failed");
 
-      const profileRes = await fetch(`${BASE_URL}/me`, {
+      const profileRes = await fetch(`${API_BASE_URL}/users/me`, {
         headers: { Authorization: `Bearer ${data.access_token}` },
       });
       const profile = await profileRes.json();

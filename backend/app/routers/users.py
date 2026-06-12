@@ -4,10 +4,10 @@
 
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from app.schemas import UserCreate, UserResponse, Token
-from app.models import UserInDB
-from app.database import users_collection, logs_collection
-from app.auth import hash_password, verify_password, create_access_token, get_current_user, log_action
+from app.schemas.db_schema import UserCreate, UserResponse, Token
+from app.schemas.db_schema import UserInDB
+from app.core.database import users_collection, logs_collection
+from app.core.auth import hash_password, verify_password, create_access_token, get_current_user, log_action
 
 router = APIRouter(prefix = "/users", tags = ["users"])
 
