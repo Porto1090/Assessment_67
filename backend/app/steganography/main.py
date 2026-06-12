@@ -110,7 +110,8 @@ def cmd_dataset(args):
 		]:
 			try:
 				capacidad = algo.calcular_capacidad(ruta_preparada)
-				payload   = algo.rellenar_payload(args.mensaje, capacidad) if capacidad else args.mensaje
+				# payload = algo.rellenar_payload(args.mensaje, capacidad) if capacidad else args.mensaje
+				payload = algo.generar_texto_aleatorio(min_bits=64, max_bits=min(capacidad, 512))
 				algo.encode(ruta_preparada, ruta_out, payload)
 				print(f"  ✓ {tag}  ({len(algo.texto_a_bits(payload))} bits ocultos)")
 			except Exception as e:
@@ -154,23 +155,33 @@ def cmd_encode(args):
 	)
 
 	algo = ALGORITMOS[args.algoritmo]()
+	capacidad = algo.calcular_capacidad(args.imagen)
+
+	# Decide el mensaje fuente
+	if args.aleatorio:
+		mensaje = algo.generar_texto_aleatorio(
+			min_bits=64,
+			max_bits=min(capacidad, 512) if capacidad else 512
+		)
+	elif args.mensaje:
+		mensaje = args.mensaje
+	else:
+		print("Error: debes proporcionar --mensaje o usar --aleatorio")
+		sys.exit(1)
+
+	payload = algo.rellenar_payload(mensaje, capacidad) if capacidad else mensaje
 
 	print(f"\nAlgoritmo : {args.algoritmo.upper()}")
 	print(f"Imagen    : {args.imagen}")
 	print(f"Salida    : {salida}")
-	print(f"Mensaje   : {args.mensaje}\n")
-
-	capacidad = algo.calcular_capacidad(args.imagen)
+	print(f"Mensaje   : {mensaje}")
+	
 	if capacidad:
-		payload = algo.rellenar_payload(args.mensaje, capacidad)
 		print(f"Capacidad : {capacidad} bits")
-		print(f"Payload   : {len(algo.texto_a_bits(payload))} bits ({payload[:40]}{'...' if len(payload)>40 else ''})")
-	else:
-		payload = args.mensaje
+		print(f"Payload   : {len(algo.texto_a_bits(payload))} bits ({payload[:40]}{'...' if len(payload)>40 else ''})\n")
 
 	algo.encode(args.imagen, salida, payload)
 	print(f"\nGuardada en: {salida}")
-
 
 # =====================================
 # DECODE
@@ -215,7 +226,8 @@ if __name__ == "__main__":
 	p_enc = sub.add_parser("encode", help="Ocultar mensaje en una imagen")
 	p_enc.add_argument("--imagen",    required=True,             help="Imagen de entrada")
 	p_enc.add_argument("--algoritmo", required=True, choices=ALGORITMOS, help="bpcs | dct | pvd | lsb")
-	p_enc.add_argument("--mensaje",   required=True,             help="Texto a ocultar")
+	p_enc.add_argument("--aleatorio", action="store_true", help="Genera un mensaje aleatorio en lugar de usar --mensaje")
+	p_enc.add_argument("--mensaje",   default=None,            help="Texto a ocultar")
 	p_enc.add_argument("--salida",    default=None,              help="Ruta de salida (opcional)")
 
 	# -- decode --

@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from abc import ABC, abstractmethod
 from PIL import Image
+import random
+import string
 
 class SteganografiaBase(ABC):
 	"""
@@ -35,6 +37,51 @@ class SteganografiaBase(ABC):
 			datos.append(int(byte, 2))
 		return datos.decode("utf-8", errors="ignore")
 
+	# Vocabulario mixto español/inglés
+	_VOCABULARIO = [
+		"the", "hello", "world", "secret", "data", "image", "pixel", "hidden",
+		"noise", "random", "cipher", "encode", "decode", "neural", "network",
+		"hola", "mundo", "secreto", "imagen", "oculto", "datos", "ruido",
+		"cifrado", "red", "neuronal", "entrenamiento", "modelo", "algoritmo",
+		"python", "matrix", "signal", "layer", "feature", "vision", "deep",
+		"bits", "byte", "flag", "token", "vector", "canal", "plano", "bloque",
+	]
+
+	@staticmethod
+	def generar_texto_aleatorio(min_bits: int = 64, max_bits: int = 512) -> str:
+		"""
+		Genera un texto secreto aleatorio mezclando palabras reales
+		(español/inglés) con segmentos alfanuméricos de ruido.
+
+		El texto resultante tiene una longitud en bits (UTF-8) dentro
+		del rango [min_bits, max_bits].
+		"""
+		objetivo_bits = random.randint(min_bits, max_bits)
+		partes = []
+		bits_acumulados = 0
+
+		while bits_acumulados < objetivo_bits:
+			# Decide aleatoriamente: palabra real o ruido
+			if random.random() < 0.6:
+				segmento = random.choice(SteganografiaBase._VOCABULARIO)
+			else:
+				longitud = random.randint(3, 10)
+				chars = string.ascii_letters + string.digits
+				segmento = ''.join(random.choices(chars, k=longitud))
+
+			# Agrega separador si ya hay contenido
+			candidato = (" " + segmento) if partes else segmento
+			bits_candidato = len(candidato.encode("utf-8")) * 8
+
+			# Si agregar este segmento se pasa del límite, para
+			if bits_acumulados + bits_candidato > objetivo_bits:
+				break
+
+			partes.append(candidato)
+			bits_acumulados += bits_candidato
+
+		return ''.join(partes)
+
 	# =====================================
 	# PREPARAR IMAGEN
 	# =====================================
@@ -46,7 +93,7 @@ class SteganografiaBase(ABC):
 		Si se indica destino guarda también una copia PNG en esa ruta.
 		"""
 		img = Image.open(ruta).convert("RGB")
-		img = img.resize(self.SIZE, Image.LANCZOS)
+		img = img.resize(self.SIZE, Image.NEAREST)
 		if destino:
 			img.save(destino, "PNG")
 		return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)

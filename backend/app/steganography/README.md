@@ -95,10 +95,10 @@ Los tres algoritmos heredan de `SteganografiaBase`, que provee:
 
 ## Uso
 
-### To process a full directory (All decoders)
+### To process a full directory (all algorithms)
 
 ```sh
-python main.py dataset --carpeta {INPUT_ROUTE} --salida {OUTPUT_ROUTE} --mensaje {MESSAGE}
+python main.py dataset --carpeta {INPUT_ROUTE} --salida {OUTPUT_ROUTE}
 ```
 
 #### Examples
@@ -106,31 +106,41 @@ python main.py dataset --carpeta {INPUT_ROUTE} --salida {OUTPUT_ROUTE} --mensaje
 ```sh
 python main.py dataset --carpeta images/
 
-python main.py dataset --carpeta images/ --salida results/ --mensaje "Hello World!"
+python main.py dataset --carpeta images/ --salida results/
 ```
 
-### To Ecode only one image
+> Messages are generated automatically with random text. The `--mensaje` flag is no longer used in `dataset`.
+
+---
+
+### To encode a single image
 
 ```sh
-python main.py encode --imagen {INPUT_ROUTE/FILE_NAME} --algoritmo {ALGORITHM_NAME} --mensaje {MESSAGE} --salida {OUTPUT_ROUTE/OUTPUT_FILE_NAME}
+python main.py encode --imagen {INPUT_ROUTE / FILE_NAME} --algoritmo {ALGORITHM} [--mensaje {MESSAGE} | --aleatorio] --salida {OUTPUT_ROUTE / OUTPUT_FILE_NAME}
 ```
 
 #### Examples
 
 ```sh
-python main.py encode --imagen image1.png --algoritmo lsb --mensaje "Hello World!"
+# Random message (new)
+python main.py encode --imagen image1.png --algoritmo lsb --aleatorio
 
-python main.py encode --imagen images/image1.png --algoritmo lsb --mensaje "Hello World!"
+python main.py encode --imagen images/image1.png --algoritmo lsb --aleatorio
 
+# Explicit message
 python main.py encode --imagen image1.png --algoritmo dct --mensaje "Hello World!" --salida dct_image1.png
 
 python main.py encode --imagen images/image1.png --algoritmo dct --mensaje "Hello World!" --salida results/dct_image1.png
 ```
 
-### To Decode only one image
+> Either `--mensaje` or `--aleatorio` is required. Available algorithms: `bpcs`, `dct`, `pvd`, `lsb`.
+
+---
+
+### To decode a single image
 
 ```sh
-python main.py decode --imagen {INPUT_ROUTE/FILE_NAME} --algoritmo {ALGORITHM_NAME}
+python main.py decode --imagen {INPUT_ROUTE / FILE_NAME} --algoritmo {ALGORITHM}
 ```
 
 #### Examples
