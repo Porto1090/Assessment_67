@@ -3,7 +3,9 @@ import requests
 import os
 from dotenv import load_dotenv
 
-from app.stego_engine import encoder, decoder 
+# from app.stego_engine import encoder, decoder
+from app.stego_engine.encoder import encoder
+from app.stego_engine.decoder import decoder
 
 load_dotenv()
 INFERENCE_API_URL = os.getenv("INFERENCE_API_URL")
