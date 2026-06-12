@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
-from app.database import history_collection 
+from app.core.database import history_collection 
 
 router = APIRouter(
   prefix="/api/history",
