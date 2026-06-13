@@ -303,8 +303,8 @@ export const translations = {
         es: "1. Sube una Imagen"
       },
       uploadText: {
-        en: "Upload a JPG, JPEG, or PNG image that may contain hidden information.", 
-        es: "Sube una imagen JPG, JPEG o PNG que pueda contener información oculta." 
+        en: "Upload a PNG image that may contain hidden information.", 
+        es: "Sube una imagen PNG que pueda contener información oculta." 
       },
       aiTitle: {
         en: "2. AI Analysis",
