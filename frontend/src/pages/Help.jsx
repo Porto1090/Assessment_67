@@ -89,7 +89,7 @@ export default function Help() {
           <div className={`space-y-4 ml-16 ${mediumText}`}>
             <p>
               <strong className={titleText}>{t.help.formats.labelFormat}</strong>{" "}
-              JPG / JPEG / PNG
+              PNG
             </p>
             <p>
               <strong className={titleText}>{t.help.formats.labelSize}</strong>{" "}

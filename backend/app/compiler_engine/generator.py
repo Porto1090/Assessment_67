@@ -1,6 +1,7 @@
 from app.compiler_engine.types import NodeType
 import requests
 import os
+import uuid  # <-- Importamos uuid para generar el id aleatorio
 from dotenv import load_dotenv
 
 # from app.stego_engine import encoder, decoder
@@ -47,26 +48,46 @@ class CodeGenerator:
         image_path = self.symbol_table[node.variable]
         
         try:
-          # Enviamos la imagen a la API de Inferencia para que nos diga qué algoritmo de esteganografía se usó
+          # Enviamos la imagen a la API de Inferencia
           with open(image_path, "rb") as file_to_predict:
+            
+            # Generamos un ID aleatorio usando uuid4
+            random_id = str(uuid.uuid4())
+            
             response = requests.post(
               f"{INFERENCE_API_URL}/api/model", 
-              files={"image": file_to_predict}
+              data={"id": random_id},              # <-- 1. Agregado el ID aleatorio
+              files={"file": file_to_predict}      # <-- 2. Cambiado de "image" a "file"
             )
               
           if not response.ok:
             raise Exception(f"La API de inferencia falló: {response.text}")
               
           inference_data = response.json()
-          detected_algorithm = inference_data.get("algorithm")
           
-          if not detected_algorithm:
-            raise Exception("La API no devolvió un algoritmo válido.")
+          # 3. Ajustamos la forma de leer la respuesta de la IA (prediccion -> clase)
+          prediccion_block = inference_data.get("prediccion", {})
+          if isinstance(prediccion_block, str):
+             raise Exception(f"Modelo inaccesible o en Demo: {prediccion_block}")
+             
+          detected_algorithm = prediccion_block.get("clase")
+          
+          # Si devuelve Cover o vacío, no intentamos extraer nada
+          if not detected_algorithm or detected_algorithm == "Cover":
+             results.append({
+                 "action": "decoded",
+                 "variable": node.variable,
+                 "ai_prediction": detected_algorithm or "Cover",
+                 "extracted_message": None,
+                 "ai_metadata": inference_data
+             })
+             continue
 
           # Con el algoritmo detectado, ejecutamos nuestro Decoder Local
+          # Usamos .lower() por seguridad para evitar errores de mayúsculas/minúsculas
           extracted_message = decoder.apply_extract(
             image_path=image_path, 
-            algorithm=detected_algorithm
+            algorithm=detected_algorithm.lower()
           )
           
           results.append({

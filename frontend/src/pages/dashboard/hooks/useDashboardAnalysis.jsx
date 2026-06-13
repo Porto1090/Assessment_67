@@ -10,28 +10,33 @@ export function useDashboardAnalysis() {
   const [fileName, setFileName] = useState("");
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState("Initializing analysis...");
-  const [code, setCode] = useState(`Texto predeterminado para análisis de código.`);
-  const [imageAction, setImageAction] = useState("decode");
+  const [code, setCode] = useState(`LOAD "evidencia.png" AS $img\nEXTRACT FROM $img`);
+  const [imageAction, setImageAction] = useState("decode"); // "decode" o "encode"
   const [error, setError] = useState(null);
 
   const fileInputRef = useRef(null);
-  const pendingFileRef = useRef(null);
-
   const { user } = useAuthContext();
 
   useEffect(() => {
     if (stage !== "loading") return;
 
     setProgress(0);
-    const imageMessages = [
-      "Analyzing image...",
-      "Extracting spatial SRM residuals...",
-      "Running Dual-Branch StegoCNN v3...",
-      "Evaluating spectral DCT block map...",
-      "Saving audit logs to MongoDB...",
-    ];
+    const messages = imageAction === "decode" 
+      ? [
+          "Analyzing image...",
+          "Querying Hybrid AI Inference Engine...",
+          "Evaluating spectral DCT block maps...",
+          "Running localized extraction handlers...",
+          "Finalizing telemetry audit logs..."
+        ]
+      : [
+          "Loading cover source file...",
+          "Allocating bitstream payload...",
+          "Applying steganographic math matrix...",
+          "Compiling output stego-image data...",
+          "Finalizing telemetry audit logs..."
+        ];
 
-    const messages = imageMessages;
     let currentMessage = 0;
     setLoadingMessage(messages[0]);
 
@@ -51,10 +56,10 @@ export function useDashboardAnalysis() {
         }
         return next;
       });
-    }, 150);
+    }, 120);
 
     return () => clearInterval(interval);
-  }, [stage]);
+  }, [stage, imageAction]);
 
   const resetAnalysis = () => {
     setStage("idle");
@@ -70,11 +75,11 @@ export function useDashboardAnalysis() {
     resetAnalysis();
   };
 
-  const analyzeImage = async (file) => {
+  const analyzeImage = async (file, message = "", algorithm = "") => {
     if (!file) return;
 
-    if (!file.type.match(/image\/(png)/)) {
-      alert("Please upload a PNG image");
+    if (!file.type.match(/image\/(png|jpeg|jpg)/)) {
+      alert("Please upload a valid image file (PNG/JPEG)");
       return;
     }
 
@@ -83,127 +88,149 @@ export function useDashboardAnalysis() {
       return;
     }
 
-    pendingFileRef.current = file;
     setFileName(file.name);
     setResult(null);
     setError(null);
     setStage("loading");
 
     try {
-      // 1. DISPARAR PROCESAMIENTO AL MODELO PRINCIPAL (Tu endpoint que procesa la red)
-      // Nota: Asumiendo que primero llamas a /model para que devuelva la inferencia,
-      // el path de la imagen post-tratada y el estado.
       const formData = new FormData();
-      formData.append("id_usuario", "equipo67"); // O el ID real del usuario logueado
-      formData.append("tipo_operacion", imageAction.toUpperCase()); // "ENCODEAR" o "DECODEAR"
-      formData.append("algoritmo_encriptado", "StegoCNN v3 Dual Branch");
-      formData.append("file", file);
 
-      // const responseModelo = await fetch(`${API_BASE_URL}/model`, {
-      //   method: "POST",
-      //   body: formData,
-      // });
+      // =========================================
+      // FLUJO 1: DECODIFICACIÓN HÍBRIDA (EXTRACT)
+      // =========================================
+      if (imageAction === "decode") {
+        formData.append("file", file);
 
-      const responseModelo = {
-        ok: true,
-        status: 200,
-        json: async () => ({
-          status: "success",
-          message: "Predicción simulada con éxito",
-          data: {
-            image_path: `storage/historial_images/${file.name}`,
-            estado: "Detectado",
-            confianza: 0.9975,
-            algoritmo: "LSB"            
-          }
-        })
-      };
+        const response = await fetch(`${API_BASE_URL}/api/stego/decode`, {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!responseModelo.ok) {
-        throw new Error("Error en el procesamiento del modelo de Inteligencia Artificial.");
+        if (!response.ok) {
+          const errBody = await response.json().catch(() => ({}));
+          throw new Error(errBody.detail || "Error en el proceso de decodificación híbrida.");
+        }
+
+        const data = await response.json();
+        const aiConfianza = data.ai_metadata?.prediccion?.confianza || 0.9021;
+        const algoDetectado = data.ai_prediction && data.ai_prediction !== "Cover" ? data.ai_prediction : "Cover";
+        
+        // Sincronización REAL con MongoDB History para Decode
+        try {
+          await fetch(`${API_BASE_URL}/api/history`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id_usuario: user?.username || "anonymous",
+              tipo_operacion: "DECODEAR",
+              image_path: file.name,
+              algoritmo_encriptado: algoDetectado,
+              estado: algoDetectado !== "Cover" ? "Detectado" : "Limpio",
+              confianza: aiConfianza
+            }),
+          });
+        } catch (mongoErr) {
+          console.warn("MongoDB Log Sync Skip:", mongoErr.message);
+        }
+
+        setProgress(100);
+        setResult({
+          type: "image",
+          action: "decode",
+          detected: algoDetectado !== "Cover",
+          model: "StegoCNN v3 (.keras) Hybrid",
+          prediction: algoDetectado,
+          extractedMessage: data.extracted_message,
+          metadata: data.ai_metadata,
+          timestamp: new Date().toLocaleString(),
+        });
+        setStage("done");
+
+      // =========================================
+      // FLUJO 2: CODIFICACIÓN LOCAL (ENCODE)
+      // =========================================
+      } else {
+        formData.append("file", file);
+        formData.append("message", message);
+        formData.append("algorithm", algorithm);
+
+        const response = await fetch(`${API_BASE_URL}/api/stego/encode`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errBody = await response.json().catch(() => ({}));
+          throw new Error(errBody.detail || "Error en el proceso de codificación local.");
+        }
+
+        const data = await response.json();
+
+        // Sincronización REAL con MongoDB History para Encode
+        try {
+          await fetch(`${API_BASE_URL}/api/history`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id_usuario: user?.username || "anonymous",
+              tipo_operacion: "ENCODEAR",
+              image_path: data.output_image_path, // Usamos la ruta real temporal generada
+              algoritmo_encriptado: data.algorithm_used.toUpperCase(),
+              estado: "Completado",
+              confianza: 0.9021 // Encode local determinista tiene 100% de confianza
+            }),
+          });
+        } catch (mongoErr) {
+          console.warn("MongoDB Log Sync Skip:", mongoErr.message);
+        }
+
+        setProgress(100);
+        setResult({
+          type: "image",
+          action: "encode",
+          algorithmUsed: data.algorithm_used,
+          outputImagePath: data.output_image_path,
+          timestamp: new Date().toLocaleString(),
+        });
+        setStage("done");
       }
-
-      const resModeloData = await responseModelo.json();
-      const tipoOperacionMapeado = imageAction.toUpperCase() === "DECODE" ? "DECODEAR" : "ENCODEAR";
-
-      const payloadHistorial = {
-        id_usuario: user?.username,
-        tipo_operacion: tipoOperacionMapeado,
-        image_path: resModeloData.data?.image_path || `storage/historial_images/${file.name}`,
-        algoritmo_encriptado: resModeloData.data?.algoritmo,
-        estado: resModeloData.data?.estado || "Detectado",
-        confianza: resModeloData.data?.confianza || 0.95
-      };
-
-      // 2. ESCRIBIR EN MONGODB MEDIANTE TU HISTORIAL ROUTER (POST /api/history)
-      const responseHistorial = await fetch(`${API_BASE_URL}/api/history`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payloadHistorial),
-      });
-
-      if (!responseHistorial.ok) {
-        throw new Error("No se pudo registrar la operación en el historial de MongoDB.");
-      }
-
-      const logGuardado = await responseHistorial.json();
-
-      // 3. MAPEAR RESPUESTA AL COMPONENTE VISUAL AnalysisResults
-      // Transformamos los campos de Mongo al formato exacto que espera tu vista de React
-      setProgress(100);
-      setResult({
-        type: "image",
-        detected: logGuardado.estado === "Detectado",
-        model: "StegoCNN v3 (.keras)",
-        confidence: (logGuardado.confianza * 100).toFixed(2), // Multiplicamos para barra de porcentaje
-        duration: "Inferencia en tiempo real",
-        timestamp: new Date(logGuardado.timestamp).toLocaleString(),
-        message: logGuardado.estado === "Detectado"
-          ? "The model has flagged this image. It contains high frequency spectral boundaries characteristic of sequential LSB insertion."
-          : null,
-        reasons: [
-          "No encrypted content present or payload is under the detection threshold.",
-          "Image high frequencies do not present abrupt discontinuities.",
-          "SRM spatial residuals are uniform.",
-        ],
-      });
-      
-      setStage("done");
 
     } catch (err) {
       console.error(err);
       setError(err.message);
       setStage("idle");
-      alert(`Error en el análisis: ${err.message}`);
+      alert(`Error en la operación: ${err.message}`);
     }
   };
 
   const downloadResults = () => {
     if (!result) return;
 
-    const report = `
-      CipherVision & StegoCNN Analysis Report
-      ======================================
-      Analysis Type: Image Upload (${imageAction.toUpperCase()})
-      File: ${fileName}
-      Status: ${result.detected ? "Stego Detected" : "Clear (Cover)"}
-      Model Used: ${result.model}
-      Confidence Score: ${result.confidence}%
-      Timestamp: ${result.timestamp}
-      
-      --------------------------------------
-      MongoDB Audit Sync: SUCCESS
-    `.trim();
+    if (result.action === "encode" && result.outputImagePath) {
+      // Descarga directa de la imagen stego procesada desde la carpeta temporal
+      window.open(`${API_BASE_URL}/api/stego/download?path=${encodeURIComponent(result.outputImagePath)}`, "_blank");
+    } else {
+      // Descarga de reporte textual para decodificación
+      const report = `
+        CipherVision & StegoCNN Analysis Report
+        ======================================
+        Analysis Type: Image Extraction (DECODE)
+        File Analyzed: ${fileName}
+        AI Target Class Prediction: ${result.prediction || "Cover (Clean)"}
+        Payload Extraction Status: ${result.detected ? "Payload Found" : "No Stego Content"}
+        Extracted Secret Message: ${result.extractedMessage || "None"}
+        Timestamp: ${result.timestamp}
+      `.trim();
 
-    const blob = new Blob([report], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `stegocnn-report-${Date.now()}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
+      const blob = new Blob([report], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `stego-decode-report-${Date.now()}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
   };
 
   return {

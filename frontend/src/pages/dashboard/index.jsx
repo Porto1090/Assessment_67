@@ -12,7 +12,6 @@ import { useDashboardAnalysis } from "@dashboard/hooks/useDashboardAnalysis";
 
 export default function Dashboard() {
   const { t } = useLanguage();
-  
   const analysis = useDashboardAnalysis(); 
 
   return (
@@ -38,6 +37,7 @@ export default function Dashboard() {
                 <ImageUploader 
                   fileInputRef={analysis.fileInputRef} 
                   analyzeImage={analysis.analyzeImage} 
+                  imageAction={analysis.imageAction} /* Pasado de forma explícita para renderizar formulario */
                 />
               </>
             )}

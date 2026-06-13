@@ -2,6 +2,7 @@ import os
 import shutil
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi.responses import FileResponse
 import requests
 from dotenv import load_dotenv
 
@@ -119,3 +120,20 @@ async def decode_image(file: UploadFile = File(...)):
 	finally:
 		if temp_input_path.exists():
 			os.remove(temp_input_path)
+   
+@router.get("/download")
+async def download_stego_image(path: str):
+  """
+  Endpoint para que el Frontend descargue la imagen stego generada.
+  """
+  file_path = Path(path)
+  
+  # Validamos que el archivo exista en el sistema
+  if not file_path.exists():
+      raise HTTPException(status_code=404, detail="El archivo temporal no existe o ya expiró.")
+      
+  return FileResponse(
+      path=file_path, 
+      media_type="image/png", 
+      filename=f"encrypted_{file_path.name}"
+  )

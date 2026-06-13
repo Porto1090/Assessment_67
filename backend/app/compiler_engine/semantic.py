@@ -8,7 +8,7 @@ class SemanticAnalyzer:
   def analyze(self, ast: list) -> dict:
     for node in ast:
       if node.type == NodeType.LOAD:
-        if not (node.path.endswith('.jpg') or node.path.endswith('.png')):
+        if not node.path.endswith('.png'):
           raise CompilerError("Semantic", f"Formato no soportado para '{node.path}' en línea {node.line}.")
         self.symbol_table[node.variable] = node.path
           
