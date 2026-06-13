@@ -59,16 +59,42 @@ Toda la plataforma se encuentra desplegada en la infraestructura privada del Lab
 ## Infraestructura
 
 ### Equipo de Infraestructura
-*Por definir*.
+** Servidor Ubuntu Linux como plataforma principal de despliegue.
+* Balanceador de carga NGINX configurado como punto de entrada de la aplicación.
+* Router institucional del TEC encargado de proporcionar acceso a Internet, DNS y NAT.
+* Router del equipo para la administración de la red local del proyecto.
+* Dos instancias Frontend desarrolladas con React y Vite para garantizar disponibilidad del servicio.
+* Backend API desarrollado con Node.js y FastAPI.
+* Backend de Inteligencia Artificial desarrollado en Python para la ejecución del modelo de estegoanálisis.
+* Base de datos MongoDB desplegada dentro de un contenedor Docker.
+* Infraestructura alojada en una nube privada institucional.*.
 
 ### Configuración Red
-*Por definir*.
+*La arquitectura se encuentra desplegada sobre una nube privada conectada a la VLAN 67 de la red institucional. El acceso de los usuarios inicia desde Internet a través del Router TEC, el cual proporciona servicios de enrutamiento, DNS y NAT.
+
+Posteriormente, el tráfico es recibido por un segundo router perteneciente al equipo de desarrollo y redirigido hacia un balanceador de carga NGINX. Este componente expone el Frontend a los usuarios de la red del TEC y gestiona la comunicación con los servicios internos alojados en la nube privada.
+
+La aplicación está compuesta por:
+
+* Dos instancias Frontend (React + Vite).
+* Un Backend API encargado de la lógica de negocio.
+* Un Backend IA encargado de ejecutar el modelo de Deep Learning.
+* Una base de datos MongoDB desplegada mediante Docker.*.
 
 ### Seguridad Red
-*Por definir*.
+*La seguridad de la solución se basa en una arquitectura multicapa:
+
+* Segmentación mediante VLAN institucional.
+* Uso de direcciones IP privadas para los servicios internos.
+* NAT para ocultar la infraestructura interna frente a Internet.
+* Balanceador NGINX como único punto de acceso a la aplicación.
+* Base de datos MongoDB aislada dentro de un contenedor Docker.
+* Separación lógica entre Frontend, Backend API y Backend IA.
+* Comunicación controlada entre componentes mediante APIs internas.
+* Restricción de acceso directo a la base de datos desde redes externas.*.
 
 ### Salida a Internet
-*Por definir*.
+*La salida a Internet es proporcionada por el Router TEC, el cual administra la conectividad externa de la infraestructura mediante servicios de enrutamiento, resolución DNS y traducción de direcciones (NAT). Esto permite que los servicios desplegados en la nube privada puedan acceder a recursos externos y recibir solicitudes de los usuarios manteniendo la seguridad de la red interna.*.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -83,10 +109,10 @@ Construido con React y Tailwind CSS, ofreciendo un diseño responsivo, paneles c
 - **Core:** Integración de `@monaco-editor/react` para proveer un editor de código enriquecido con resaltado de sintaxis (*syntax highlighting*) personalizado para nuestro DSL.
 
 ### Backend
-*Por definir*.
+*El Backend API fue desarrollado con Python y FastAPI, y actúa como el núcleo de comunicación del sistema. Su función principal es recibir las solicitudes del frontend, gestionar la autenticación de usuarios mediante JWT, procesar las operaciones del compilador DSL, coordinar la comunicación con el motor de esteganografía y el modelo de inteligencia artificial, así como almacenar y consultar información en la base de datos MongoDB. Además, registra el historial de operaciones realizadas por los usuarios, permitiendo mantener un control y seguimiento de las actividades del sistema. Gracias a esta arquitectura, se centraliza la lógica de negocio, se mejora la seguridad y se facilita el mantenimiento y la escalabilidad de la aplicación.*.
 
 ### Base de Datos
-*Por definir*.
+*La Base de Datos fue implementada utilizando MongoDB y se encarga de almacenar de forma segura toda la información generada por el sistema. Entre los datos gestionados se encuentran los usuarios registrados, los historiales de análisis realizados, los registros de actividad y la información necesaria para el funcionamiento de la aplicación. Al utilizar una base de datos NoSQL, el sistema puede manejar estructuras de datos flexibles y escalar fácilmente conforme aumenta el volumen de información. Además, su integración con el Backend API permite realizar consultas y actualizaciones de manera eficiente, garantizando la disponibilidad y consistencia de los datos.*.
 
 ### Seguridad Web
 - Mitigación de Riesgos de Inyección: Dado que la aplicación ejecuta código generado dinámicamente, el backend implementa un mecanismo de aislamiento (Sandboxing) para ejecutar los scripts de Python de forma segura.
