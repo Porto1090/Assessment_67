@@ -7,32 +7,33 @@ export default function Documentation() {
   const { t } = useLanguage();
   const [active, setActive] = useState("home");
 
+  // Estructuramos el índice según las nuevas traducciones
   const sections = [
     {
-      title: t.docs.categories.sections,
+      title: t.docs.categories.gettingStarted,
       items: [
         {
-          id: "whatsNew",
-          name: t.docs.articles.whatsNew.name,
-          description: t.docs.articles.whatsNew.description,
-          content: t.docs.articles.whatsNew.content,
+          id: "whatIs",
+          name: t.docs.articles.whatIs.name,
+          description: t.docs.articles.whatIs.description,
+          content: t.docs.articles.whatIs.content,
         },
         {
-          id: "tutorial",
-          name: t.docs.articles.tutorial.name,
-          description: t.docs.articles.tutorial.description,
-          content: t.docs.articles.tutorial.content,
+          id: "quickStart",
+          name: t.docs.articles.quickStart.name,
+          description: t.docs.articles.quickStart.description,
+          content: t.docs.articles.quickStart.content,
         },
       ],
     },
     {
-      title: t.docs.categories.reference,
+      title: t.docs.categories.coreConcepts,
       items: [
         {
-          id: "globalIndex",
-          name: t.docs.articles.globalIndex.name,
-          description: t.docs.articles.globalIndex.description,
-          content: t.docs.articles.globalIndex.content,
+          id: "algorithms",
+          name: t.docs.articles.algorithms.name,
+          description: t.docs.articles.algorithms.description,
+          content: t.docs.articles.algorithms.content,
         },
         {
           id: "glossary",
@@ -43,19 +44,19 @@ export default function Documentation() {
       ],
     },
     {
-      title: t.docs.categories.project,
+      title: t.docs.categories.support,
       items: [
         {
-          id: "reportingIssues",
-          name: t.docs.articles.reportingIssues.name,
-          description: t.docs.articles.reportingIssues.description,
-          content: t.docs.articles.reportingIssues.content,
+          id: "bestPractices",
+          name: t.docs.articles.bestPractices.name,
+          description: t.docs.articles.bestPractices.description,
+          content: t.docs.articles.bestPractices.content,
         },
         {
-          id: "projectRepository",
-          name: t.docs.articles.projectRepository.name,
-          description: t.docs.articles.projectRepository.description,
-          content: t.docs.articles.projectRepository.content,
+          id: "architecture",
+          name: t.docs.articles.architecture.name,
+          description: t.docs.articles.architecture.description,
+          content: t.docs.articles.architecture.content,
         },
       ],
     },
@@ -73,19 +74,19 @@ export default function Documentation() {
   return (
     <div className="flex h-full w-full flex-col bg-white dark:bg-slate-900 transition-colors duration-200">
       <header className="mb-6">
-        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold text-sm uppercase tracking-wider mb-2">
+        <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold text-sm uppercase tracking-wider mb-2">
           <BookOpen className="w-4 h-4" />
           <span>Docs</span>
         </div>
         <h2 className="text-2xl lg:text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
-          {t.documentationTitle}
+          {t.docs.title}
         </h2>
         <p className="mt-2 text-sm lg:text-base leading-relaxed text-slate-500 dark:text-slate-400">
-          {t.documentationSubtitle}
+          {t.docs.subtitle}
         </p>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-5 lg:p-6 shadow-inner">
+      <div className="min-h-0 flex-1 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-5 lg:p-6 shadow-inner custom-scrollbar">
         
         {/* VISTA HOME: Lista de Secciones y Artículos */}
         {active === "home" && (
@@ -102,18 +103,18 @@ export default function Documentation() {
                       key={item.id}
                       type="button"
                       onClick={() => setActive(item.id)}
-                      className="group flex w-full items-start justify-between gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-4 text-left shadow-sm transition-all hover:border-blue-500/50 dark:hover:border-blue-400/50 hover:shadow-md"
+                      className="group flex w-full items-start justify-between gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-4 text-left shadow-sm transition-all hover:border-cyan-500/50 dark:hover:border-cyan-400/50 hover:shadow-md"
                     >
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          <FileText className="w-4 h-4 text-slate-400 group-hover:text-blue-500" />
+                        <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                          <FileText className="w-4 h-4 text-slate-400 group-hover:text-cyan-500" />
                           {item.name}
                         </div>
                         <p className="text-xs lg:text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                           {item.description}
                         </p>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-transform group-hover:translate-x-0.5 shrink-0 mt-0.5" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-cyan-500 transition-transform group-hover:translate-x-0.5 shrink-0 mt-0.5" />
                     </button>
                   ))}
                 </div>
@@ -122,15 +123,16 @@ export default function Documentation() {
           </div>
         )}
 
+        {/* VISTA ARTÍCULO */}
         {active !== "home" && current && (
           <div className="animate-fade-in">
             <button
               type="button"
               onClick={() => setActive("home")}
-              className="group mb-5 inline-flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="group mb-5 inline-flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
             >
               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-              {t.backToDocumentation || "Back to Documentation"}
+              {t.docs.backToDocs}
             </button>
 
             <article className="space-y-4">
@@ -138,12 +140,12 @@ export default function Documentation() {
                 {current.name}
               </h3>
               
-              <p className="text-sm lg:text-base leading-relaxed text-slate-600 dark:text-slate-300 border-l-2 border-blue-500 pl-3 bg-blue-50/30 dark:bg-blue-500/5 py-1 rounded-r-md">
+              <p className="text-sm lg:text-base leading-relaxed text-slate-600 dark:text-slate-300 border-l-2 border-cyan-500 pl-3 bg-cyan-50/30 dark:bg-cyan-500/5 py-1 rounded-r-md">
                 {current.description}
               </p>
 
               <div className="mt-6 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-white dark:bg-slate-900 p-5 shadow-sm">
-                <pre className="whitespace-pre-wrap font-mono text-xs lg:text-sm leading-relaxed text-slate-700 dark:text-slate-300 selection:bg-blue-500/20">
+                <pre className="whitespace-pre-wrap font-sans text-sm lg:text-base leading-relaxed text-slate-700 dark:text-slate-300 selection:bg-cyan-500/20">
                   {current.content}
                 </pre>
               </div>
