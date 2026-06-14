@@ -322,7 +322,7 @@ Se desarrolló un lenguaje de dominio específico diseñado exclusivamente para 
 
 **Automatización e Integración Continua (CI/CD):**
 
-* Pipelines automatizados que ejecutan linters y pruebas unitarias automáticas ante cada Push o Pull Request hacia las ramas principales, mitigando la introducción de deuda técnica.
+* Pipelines automatizados que ejecutan el pull en la instancia de la nube cada que se hacia un push a `develop` para tenerlo al momento nos ahorrará mucho tiempo de deploy en general.
 
 ### Gestión del Proyecto (GitHub Projects)
 
@@ -360,23 +360,27 @@ Se desarrolló un lenguaje de dominio específico diseñado exclusivamente para 
 
 [X] Implementeación de servicio de autenticación en el backend y base de datos. (Registro, inicio de sesion, hasheo de contraseñas, implementación de tokens JWT).
 
-[ ] Más tareas por definir.
+[X] Finiquitar gran parte del Frontend esperando por el Backend terminado.
+
+[X] Hostear todos los servicios desde la nube privada del Hub.
 
 ### Iteration 3: Miércoles, Jun 10
 
 [X] Recolección y preprocesamiento de datasets para el entrenamiento del modelo de IA.
 
-[ ] Más tareas por definir.
+[X] Generar el lenguaje para empezar a hacer el compilador paso por paso. 
 
 ### Iteration 4: Jueves, Jun 11
 
 [X] Entrenamiento de modelo en computadora potente del hub de ciber seguridad, conexión por ssh.
 
-[ ] Más tareas por definir.
+[X] Hacer la integración del Backend con sus endpoints y el Frontend para que funcionen como se esperaba.
+
+[X] Ver partidos del mundial (inauguración Mexico vs Sudáfrica).
 
 ### Iteration 5: Viernes, Jun 12
 
-[ ] Más tareas por definir.
+[X] Literalmente acabar todo el proyecto.
 
 [X] Diseñar slides para presentación de proyecto.
 
