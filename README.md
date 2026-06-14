@@ -338,53 +338,53 @@ Se desarrolló un lenguaje de dominio específico diseñado exclusivamente para 
 
 ### Iteration 0: FindeSemana, Jun 06-07
 
-[X] Creación del repositortio y configuración básica del mismo.
+- [X] Creación del repositortio y configuración básica del mismo.
 
-[X] Organización del equipo, asignación de roles y responsabilidades.
+- [X] Organización del equipo, asignación de roles y responsabilidades.
 
-[X] Organización de los directorios de código, documentación y recursos.
+- [X] Organización de los directorios de código, documentación y recursos.
 
-[X] Establecer scope del proyecto, definir requerimientos y diseñar la arquitectura general de la plataforma.
+- [X] Establecer scope del proyecto, definir requerimientos y diseñar la arquitectura general de la plataforma.
 
 ### Iteration 1: Lunes, Jun 08
 
-[X] Configuración inicial de la infraestructura en la nube privada del laboratorio de Ciberseguridad.
+- [X] Configuración inicial de la infraestructura en la nube privada del laboratorio de Ciberseguridad.
 
-[X] Diseño preliminar del DSL y definición de su gramática.
+- [X] Diseño preliminar del DSL y definición de su gramática.
 
-[X] Investigación acerca de los métodos de esteganografía a implementar.
+- [X] Investigación acerca de los métodos de esteganografía a implementar.
 
 ### Iteration 2: Martes, Jun 09
 
-[X] Implementación de base de datos no relacional en MongoDB.
+- [X] Implementación de base de datos no relacional en MongoDB.
 
-[X] Implementeación de servicio de autenticación en el backend y base de datos. (Registro, inicio de sesion, hasheo de contraseñas, implementación de tokens JWT).
+- [X] Implementeación de servicio de autenticación en el backend y base de datos. (Registro, inicio de sesion, hasheo de contraseñas, implementación de tokens JWT).
 
-[X] Finiquitar gran parte del Frontend esperando por el Backend terminado.
+- [X] Finiquitar gran parte del Frontend esperando por el Backend terminado.
 
-[X] Hostear todos los servicios desde la nube privada del Hub.
+- [X] Hostear todos los servicios desde la nube privada del Hub.
 
 ### Iteration 3: Miércoles, Jun 10
 
-[X] Recolección y preprocesamiento de datasets para el entrenamiento del modelo de IA.
+- [X] Recolección y preprocesamiento de datasets para el entrenamiento del modelo de IA.
 
-[X] Generar el lenguaje para empezar a hacer el compilador paso por paso. 
+- [X] Generar el lenguaje para empezar a hacer el compilador paso por paso. 
 
 ### Iteration 4: Jueves, Jun 11
 
-[X] Entrenamiento de modelo en computadora potente del hub de ciber seguridad, conexión por ssh.
+- [X] Entrenamiento de modelo en computadora potente del hub de ciber seguridad, conexión por ssh.
 
-[X] Hacer la integración del Backend con sus endpoints y el Frontend para que funcionen como se esperaba.
+- [X] Hacer la integración del Backend con sus endpoints y el Frontend para que funcionen como se esperaba.
 
-[X] Ver partidos del mundial (inauguración Mexico vs Sudáfrica).
+- [X] Ver partidos del mundial (inauguración Mexico vs Sudáfrica).
 
 ### Iteration 5: Viernes, Jun 12
 
-[X] Literalmente acabar todo el proyecto.
+- [X] Literalmente acabar todo el proyecto.
 
-[X] Diseñar slides para presentación de proyecto.
+- [X] Diseñar slides para presentación de proyecto.
 
-[X] Presentación final con profesor (20:30) en salón de juntas del hub de ciberseguridad.
+- [X] Presentación final con profesor (20:30) en salón de juntas del hub de ciberseguridad.
 
 > [!IMPORTANT]
 > **Nota de Gestión:** El detalle del progreso diario, la asignación de tasks individuales y la trazabilidad de los commits asociados a cada requerimiento pueden ser consultados en la pestaña de Projects de este repositorio.
