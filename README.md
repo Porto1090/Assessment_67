@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="#infraestructura">Infraestructura</a> •
-  <a href="#aplicación-web">Aplicación Web</a> •
+  <a href="#arquitectura-del-sistema">Arquitectura del Sistema</a> •
   <a href="#ciencias-computacionales">Ciencias Computacionales</a> •
   <a href="#instalación">Instalación</a>
 </p>
@@ -28,16 +28,19 @@ Toda la plataforma se encuentra desplegada en la infraestructura privada del Lab
       <ul>
         <li><a href="#equipo-de-infraestructura">Equipo de Infraestructura</a></li>
         <li><a href="#configuración-red">Configuración Red</a></li>
-        <li><a href="#seguridad-red">Seguridad Red</a></li>
         <li><a href="#salida-a-internet">Salida a Internet</a></li>
+        <li><a href="#horizon-openstack">Horizon Openstack</a></li>
+        <li><a href="#seguridad-red">Seguridad Red</a></li>
       </ul>
     </li>
     <li>
-      <a href="#aplicación-web">Aplicación Web</a>
+      <a href="#arquitectura-del-sistema">Arquitectura del Sistema</a>
       <ul>
         <li><a href="#frontend">Frontend</a></li>
-        <li><a href="#backend">Backend</a></li>
+        <li><a href="#backend-api">Backend API</a></li>
+        <li><a href="#backend-modelo-cnn">Backend Modelo</a></li>
         <li><a href="#base-de-datos">Base de Datos</a></li>
+        <li><a href="#balanceador-de-carga">Balanceador de Carga</a></li>
         <li><a href="#seguridad-web">Seguridad Web</a></li>
         <li><a href="#manejo-de-usuarios">Manejo de usuarios</a></li>
         <li><a href="#logs-y-auditoría">Logs y Auditoría</a></li>
@@ -57,6 +60,80 @@ Toda la plataforma se encuentra desplegada en la infraestructura privada del Lab
     <li><a href="#integrantes">Integrantes</a></li>
   </ol>
 </details>
+
+## Infraestructura
+
+### Equipo de Infraestructura
+
+El Equipo 2 de Infraestructura contó con un router Cisco y una computadora con Ubuntu Linux, utilizados para la configuración de la red, el despliegue de servicios y la administración de la infraestructura de la nube privada.
+
+### Configuración Red
+
+Se configuró el router Infra2 como punto principal de comunicación entre la red interna y la red externa. La interfaz externa obtuvo su dirección IP mediante DHCP, mientras que la interfaz interna fue configurada en la red 172.16.67.0/24, correspondiente a la VLAN 67.
+
+Además, se implementó PAT Overload para permitir que los dispositivos internos accedieran a Internet utilizando una única dirección IP pública. También se configuró una traducción estática de puertos (PAT estático) para exponer el servicio web a través de la dirección:
+
+- http://10.49.12.34:6767
+
+Finalmente, se agregaron rutas estáticas para permitir la comunicación con las redes internas necesarias para el funcionamiento de la plataforma OpenStack.
+
+```ssh
+hostname Infra2
+
+enable secret clavehub123
+
+interface gigabitethernet 0/0/0
+ip address dhcp
+ip nat outside
+no shutdown
+exit
+
+interface gigabitethernet 0/0/1
+ip address 172.16.67.254 255.255.255.0
+ip nat inside
+! encapsulation dot1q 67
+! ip access-group 100 in
+no shutdown
+exit
+
+access-list 101 permit ip 172.16.67.0 0.0.0.255 any
+access-list 100 permit tcp 172.16.67.0 0.0.0.255 any eq 22
+access-list 100 permit tcp 172.16.67.0 0.0.0.255 any eq 443
+access-list 100 deny ip any any
+
+ip nat inside source list 101 interface gigabitethernet 0/0/0 overload
+ip nat inside source static tcp 10.49.12.34 443 interface g0/0/0 6767
+
+ip route 192.168.200.0 255.255.255.0 172.16.67.10
+ip route 192.168.133.0 255.255.255.0 172.16.67.10
+```
+### Salida a Internet
+
+La arquitectura se encuentra conectada a la VLAN 67, utilizada como red interna de la solución. El router de infraestructura está conectado al switch institucional a través del puerto 3, el cual proporciona acceso al router/firewall encargado de la comunicación con la nube privada OpenStack.
+
+El acceso desde Internet es gestionado por el router institucional del TEC, encargado de proporcionar servicios de enrutamiento, resolución DNS y traducción de direcciones (NAT/PAT), permitiendo que los usuarios externos accedan de forma controlada a los servicios publicados.
+
+### Horizon Openstack
+
+La infraestructura fue desplegada sobre una nube privada OpenStack administrada mediante Horizon. Esta plataforma permitió la creación y gestión de máquinas virtuales, redes, almacenamiento y recursos de cómputo necesarios para alojar la aplicación y sus servicios asociados.
+
+Contabamos con diferentes instancias para alojar los respectivos servicios:
+- Frontend67 (172.16.67.111)
+- Backend (172.16.67.177)
+- DB (172.16.67.101)
+
+### Seguridad Red
+
+La seguridad de la solución se implementó mediante una arquitectura de múltiples capas que incluye:
+
+* Segmentación de la red mediante VLAN institucional.
+* Uso exclusivo de direcciones IP privadas para los servicios internos.
+* Implementación de NAT para ocultar la infraestructura interna frente a accesos externos.
+* NGINX como único punto de entrada a la aplicación.
+* Base de datos MongoDB aislada dentro de contenedores Docker.
+* Comunicación entre componentes controlada mediante APIs internas.
+* Restricción del acceso directo a la base de datos desde redes externas.
+* Implementamos security gropus especifico para cada instancia
 
 ## Arquitectura del Sistema
 
@@ -81,8 +158,7 @@ experiencia de desarrollo (DX):
 
 ### Backend API
 
-Desarrollado con **FastAPI (Python)** <!-- VERIFICAR: ¿hay también un
-componente en NodeJS, o se elimina esta mención? -->. Es el núcleo de
+Desarrollado con **FastAPI (Python)**. Es el núcleo de
 comunicación del sistema y se encarga de:
 
 * Gestionar la autenticación de usuarios mediante JWT.
@@ -91,11 +167,35 @@ comunicación del sistema y se encarga de:
 * Almacenar y consultar información en MongoDB.
 * Registrar el historial de operaciones (logs).
 
-### Backend - Modelo CNN
+#### Documentación de la API
+
+FastAPI genera automáticamente la documentación interactiva de todos los endpoints.
+
+Puede accederse desde:
+
+```
+http://localhost:4321/docs
+```
+
+Esta interfaz permite visualizar los endpoints disponibles, consultar sus parámetros y probar solicitudes directamente desde el navegador.
+
+### Backend Modelo CNN
 
 Instancia independiente desarrollada en **Python con PyTorch**, que aloja el
 modelo entrenado. Recibe una imagen como entrada y devuelve una clasificación
 multiclase: `cover / lsb / dct / pvd / bpcs`.
+
+#### Documentación de la API del Modelo
+
+FastAPI genera automáticamente la documentación interactiva de todos los endpoints.
+
+Puede accederse desde:
+
+```
+http://localhost:8080/docs
+```
+
+Esta interfaz permite visualizar los endpoints disponibles, consultar sus parámetros y probar solicitudes directamente desde el navegador.
 
 ### Base de Datos
 
@@ -105,74 +205,16 @@ Colecciones: `Users`, `Logs`, `History`.
 ### Balanceador de Carga
 
 **NGINX** como punto único de entrada, redirigiendo el tráfico entre las
-instancias del sistema.
+instancias del sistema. Aplicando una salida a la red del Tec al hacer PAT y aún así comunicandose con el Backend de la nube privada por medio de la ruta en VITE_BACKEND_URL como `/api`
 
----
-
-## Infraestructura y Red
-
-El Equipo-2 de Infraestructura tuvo asignado un router Cisco y una
-computadora con Ubuntu Linux como plataforma de despliegue.
-
-La arquitectura está desplegada sobre una nube privada conectada a la
-**VLAN 67** de la red institucional. El acceso de los usuarios desde Internet
-pasa por el **Router TEC**, que provee enrutamiento, DNS y NAT/PAT hacia las
-instancias internas.
-
-### Configuración del Router
-
-```ssh
-hostname Infra2
-
-enable secret clavehub123
-
-interface gigabitethernet 0/0/0
-ip address dhcp
-ip nat outside
-no shutdown
-exit
-
-interface gigabitethernet 0/0/1
-ip address 172.16.67.254 255.255.255.0
-ip nat inside
-! encapsulation dot1q 67
-! ip access-group 100 in   <!-- VERIFICAR: ¿sigue pendiente o ya se aplicó? -->
-no shutdown
-exit
-
-access-list 101 permit ip 172.16.67.0 0.0.0.255 any
-access-list 100 permit tcp 172.16.67.0 0.0.0.255 any eq 22
-access-list 100 permit tcp 172.16.67.0 0.0.0.255 any eq 443
-access-list 100 deny ip any any
-
-ip nat inside source list 101 interface gigabitethernet 0/0/0 overload
-
-ip route 192.168.200.0 255.255.255.0 172.16.67.10
-ip route 192.168.133.0 255.255.255.0 172.16.67.10
-```
-
-### Seguridad de Red
-
-La seguridad de la solución se basa en una arquitectura multicapa:
-
-* Segmentación mediante VLAN institucional.
-* Uso de direcciones IP privadas para los servicios internos.
-* NAT para ocultar la infraestructura interna frente a Internet.
-* NGINX como único punto de acceso a la aplicación.
-* MongoDB aislado dentro de un contenedor Docker.
-* Comunicación controlada entre componentes mediante APIs internas.
-* Restricción de acceso directo a la base de datos desde redes externas.
-
----
-
-## Seguridad Web
+### Seguridad Web
 
 * **Aislamiento de ejecución (Sandboxing):** dado que la aplicación ejecuta código generado dinámicamente, el backend aísla la ejecución de los scripts de Python.
 * **Hardening:** HTTPS estricto (HSTS), CORS restringido, y sanitización de cabeceras mediante Helmet.js.
 
 ---
 
-## Logs y Auditoría
+### Logs y Auditoría
 
 La aplicación mantiene un registro de auditoría de las acciones de los usuarios, almacenado en la colección `logs` de MongoDB.
 
