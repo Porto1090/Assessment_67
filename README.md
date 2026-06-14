@@ -393,10 +393,6 @@ Se desarrolló un lenguaje de dominio específico diseñado exclusivamente para 
 
 ## Instalación
 
-```bash
-
-```
-
 ### Prerequisitos
 
 * [Node.js](https://nodejs.org/es/download)
@@ -404,10 +400,117 @@ Se desarrolló un lenguaje de dominio específico diseñado exclusivamente para 
 
 ### Instalación Manual
 
+1. Clonar el Repositorio
 ```bash
 # Clonar el repositorio
 git clone https://github.com/Porto1090/Assessment_67
+cd Assessment_67
 ```
+
+2. Base de Datos (MongoDB)
+El proyecto requiere una instancia local de MongoDB corriendo en el puerto estándar.
+
+Asegúrate de tener **MongoDB Community Server** instalado y activo en tu máquina.
+- Verificar que MongoDB esté activo:
+```
+mongosh
+```
+La base de datos se creará automáticamente con el nombre assessment67 al interactuar con la aplicación.
+El URI de conexión por defecto es: `mongodb://127.0.0.1:27017/assessment67`
+
+3. Backend de la API Principal (backend)
+Este servicio actúa como la API central, gestiona la persistencia en MongoDB y se comunica con el servicio de inferencia. Está desarrollado con FastAPI.
+
+- Navegar al directorio:
+```
+# Desde la raíz del proyecto
+cd backend
+```
+
+- Crear y activar el entorno virtual (Python):
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
+- Instalar dependencias:
+```
+pip install -r requirements.txt
+```
+
+- Configurar variables de entorno (.env):
+Crea un archivo `.env` en la raíz de la carpeta backend con el siguiente contenido:
+```
+MONGO_URL=mongodb://127.0.0.1:27017/assessment67
+SECRET_KEY=82dbd4809445ca0e19469161403606a93fa800ac55bf26958d1a02a4b12c6429
+INFERENCE_API_URL=http://localhost:8080
+```
+
+- Iniciar el servicio de desarrollo:
+```
+uvicorn app.main:app --reload --host localhost --port 4321
+```
+
+4. Backend del Modelo de IA (model)
+Este servicio independiente maneja la carga de pesos y la ejecución de inferencias del modelo. También utiliza FastAPI.
+
+- Navegar al directorio:
+```
+# Desde la raíz del proyecto
+cd model
+```
+
+- Crear y activar el entorno virtual (Python):
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
+- Instalar dependencias:
+```
+pip install -r requirements.txt
+```
+
+- Iniciar el servicio de desarrollo:
+```
+uvicorn app.main:app --reload --host localhost --port 8080
+```
+
+5. Frontend (frontend)
+La interfaz de usuario está construida con React y Vite.
+
+- Navegar al directorio:
+```
+# Desde la raíz del proyecto
+cd frontend
+```
+
+- Instalar dependencias de node
+```
+npm install
+```
+
+- Configurar variables de entorno (.env):
+Crea un archivo `.env` en la raíz de la carpeta frontend para apuntar a la API principal:
+```
+VITE_BACKEND_URL=http://localhost:4321
+```
+
+- Iniciar el servidor de desarrollo:
+```
+npm run dev
+```
+
+### Resumen de Puertos y Servicios
+
+Una vez que todo esté corriendo, la arquitectura local se distribuirá de la siguiente manera:
+
+|Servicio|	Tecnología|	URL Local|
+| --- | --- | --- |
+|Frontend|	Vite + React|	http://localhost:5173|
+|API Backend|	FastAPI / Uvicorn|	http://localhost:4321|
+|Model Backend|	FastAPI / Uvicorn|	http://localhost:8080|
+|Base de Datos|	MongoDB|	mongodb://127.0.0.1:27017|
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
