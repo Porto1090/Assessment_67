@@ -441,7 +441,8 @@ pip install -r requirements.txt
 - Configurar variables de entorno (.env):
 Crea un archivo `.env` en la raíz de la carpeta backend con el siguiente contenido:
 ```
-MONGO_URL=mongodb://127.0.0.1:27017/assessment67
+# MONGO_URL=mongodb://127.0.0.1:27017/assessment67 # Despliegue en nube institucional
+MONGO_URL=mongodb://localhost:27017 # Despliegue en LocalHost
 SECRET_KEY=82dbd4809445ca0e19469161403606a93fa800ac55bf26958d1a02a4b12c6429
 INFERENCE_API_URL=http://localhost:8080
 ```
